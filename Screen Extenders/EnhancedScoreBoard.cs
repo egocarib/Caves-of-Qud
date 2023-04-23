@@ -48,7 +48,7 @@ namespace QudUX.ScreenExtenders
 
     public class EnhancedScoreEntry : ScoreEntry2
     {
-        public EnhancedScoreEntry(ScoreEntry2 scoreEntry) : base(scoreEntry.Score, scoreEntry.Description, scoreEntry.Details, scoreEntry.Turns, scoreEntry.GameId, scoreEntry.GameMode)
+        public EnhancedScoreEntry(ScoreEntry2 scoreEntry) : base(scoreEntry.Score, scoreEntry.Details, scoreEntry.Turns, scoreEntry.GameId, scoreEntry.GameMode, scoreEntry.Level, scoreEntry.Name)
         {
 
             if ((scoreEntry == null) || (string.IsNullOrEmpty(scoreEntry.Details)))

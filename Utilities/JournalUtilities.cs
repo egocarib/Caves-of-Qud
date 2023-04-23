@@ -34,8 +34,7 @@ namespace QudUX.Utilities
         public static string GenerateName()
         {
             string text;
-            text = NameMaker.MakeName(null, null, null, null, "Qudish", null, null, null, "Site");
-
+            text = NameMaker.MakeName(null, null, null, null, "Qudish", null, null, null, null, "Site");
             int chance = 50;
             if (chance.in100())
             {

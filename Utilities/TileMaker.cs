@@ -133,15 +133,9 @@ namespace QudUX.Utilities
                 return;
             }
             RenderEvent renderData = new RenderEvent();
-            Examiner examinerPart = go.GetPart<Examiner>();
-            if (examinerPart != null && !string.IsNullOrEmpty(examinerPart.UnknownTile) && !go.Understood())
-            {
-                renderData.Tile = examinerPart.UnknownTile;
-            }
-            else
-            {
-                renderData.Tile = go.pRender.Tile;
-            }
+
+            renderData.Tile = go.pRender.Tile;
+
             if (!string.IsNullOrEmpty(pRender.TileColor))
             {
                 renderData.ColorString = pRender.TileColor;
