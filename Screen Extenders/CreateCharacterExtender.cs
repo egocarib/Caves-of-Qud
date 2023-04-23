@@ -64,11 +64,12 @@ namespace QudUX.ScreenExtenders
         public static void ApplyTileToEffects(GameObject target, string newTile)
         {
             //Sets the new tile to several effects that would otherwise override it.
-            if (target.HasPart(typeof(HologramMaterial)))
+            // HologramMaterial does not contain .Tile
+            /*if (target.HasPart(typeof(HologramMaterial)))
             {
                 HologramMaterial part = target.GetPart<HologramMaterial>();
                 part.Tile = newTile;
-            }
+            }*/
             if (target.HasPart(typeof(HologramMaterialPrimary)))
             {
                 HologramMaterialPrimary part = target.GetPart<HologramMaterialPrimary>();

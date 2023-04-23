@@ -571,7 +571,7 @@ namespace XRL.UI
                 Buffer.Goto(34, 24);
                 Buffer.Write("{{y|[{{W|?}} view keys]}}");
 
-                TextConsole.DrawBuffer(Buffer, ImposterManager.getImposterUpdateFrame()); //need to update imposters because we've toggled their visibility
+                TextConsole.DrawBuffer(Buffer, ImposterManager.getImposterUpdateFrame(Buffer)); //need to update imposters because we've toggled their visibility
                 if (!XRL.Core.XRLCore.Core.Game.Running)
                 {
                     if (bShowInventoryTiles)
