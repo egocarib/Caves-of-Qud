@@ -1,15 +1,15 @@
 === QudUX 2.0 Errors ===
---Harmony Patches\Patch_XRL_World_BeginConversationEvent.cs(13,72): error CS0246: The type or namespace name 'Conversation' could not be found (are you missing a using directive or an assembly reference?)
---Wishes\FlipTile.cs(24,25): error CS1739: The best overload for 'PickDestinationCell' does not have a parameter named 'Vis'
+-- Harmony Patches\Patch_XRL_World_BeginConversationEvent.cs(13,72): error CS0246: The type or namespace name 'Conversation' could not be found (are you missing a using directive or an assembly reference?)
+-- Wishes\FlipTile.cs(24,25): error CS1739: The best overload for 'PickDestinationCell' does not have a parameter named 'Vis'
 
---Utilities\TileMaker.cs(137,76): error CS1061: 'Examiner' does not contain a definition for 'UnknownTile' and no accessible extension method 'UnknownTile' accepting a first argument of type 'Examiner' could be found (are you missing a using directive or an assembly reference?)
---Utilities\TileMaker.cs(139,48): error CS1061: 'Examiner' does not contain a definition for 'UnknownTile' and no accessible extension method 'UnknownTile' accepting a first argument of type 'Examiner' could be found (are you missing a using directive or an assembly reference?)
+-- Utilities\TileMaker.cs(137,76): error CS1061: 'Examiner' does not contain a definition for 'UnknownTile' and no accessible extension method 'UnknownTile' accepting a first argument of type 'Examiner' could be found (are you missing a using directive or an assembly reference?)
+-- Utilities\TileMaker.cs(139,48): error CS1061: 'Examiner' does not contain a definition for 'UnknownTile' and no accessible extension method 'UnknownTile' accepting a first argument of type 'Examiner' could be found (are you missing a using directive or an assembly reference?)
 
 -- Screens\QudUX_InventoryScreen.cs(27,65): error CS0246: The type or namespace name 'SortGODisplayName' could not be found (are you missing a using directive or an assembly reference?)
-Screens\QudUX_InventoryScreen.cs(28,59): error CS0246: The type or namespace name 'SortGOCategory' could not be found (are you missing a using directive or an assembly reference?)
-?? Screens\QudUX_InventoryScreen.cs(92,45): error CS1061: 'GameObject' does not contain a definition for 'GetCachedDisplayNameStripped' and no accessible extension method 'GetCachedDisplayNameStripped' accepting a first argument of type 'GameObject' could be found (are you missing a using directive or an assembly reference?)
-Screens\QudUX_InventoryScreen.cs(27,23): error CS0246: The type or namespace name 'SortGODisplayName' could not be found (are you missing a using directive or an assembly reference?)
-Screens\QudUX_InventoryScreen.cs(28,23): error CS0246: The type or namespace name 'SortGOCategory' could not be found (are you missing a using directive or an assembly reference?)
+-- Screens\QudUX_InventoryScreen.cs(27,23): error CS0246: The type or namespace name 'SortGODisplayName' could not be found (are you missing a using directive or an assembly reference?)
+-- Screens\QudUX_InventoryScreen.cs(92,45): error CS1061: 'GameObject' does not contain a definition for 'GetCachedDisplayNameStripped' and no accessible extension method 'GetCachedDisplayNameStripped' accepting a first argument of type 'GameObject' could be found (are you missing a using directive or an assembly reference?)
+-- Screens\QudUX_InventoryScreen.cs(28,59): error CS0246: The type or namespace name 'SortGOCategory' could not be found (are you missing a using directive or an assembly reference?)
+-- Screens\QudUX_InventoryScreen.cs(28,23): error CS0246: The type or namespace name 'SortGOCategory' could not be found (are you missing a using directive or an assembly reference?)
 ?? Screens\QudUX_InventoryScreen.cs(574,64): error CS7036: There is no argument given that corresponds to the required formal parameter 'Buffer' of 'ImposterManager.getImposterUpdateFrame(ScreenBuffer)'
 
 

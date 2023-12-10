@@ -21,7 +21,7 @@ namespace QudUX.Wishes
                 {
                     Cell cell = player.pPhysics.PickDestinationCell(
                         Range: 999,
-                        Vis: AllowVis.OnlyExplored,
+                        VisLevel: AllowVis.OnlyExplored,
                         Locked: false,
                         Style: PickTarget.PickStyle.EmptyCell);
                     if (cell != null)

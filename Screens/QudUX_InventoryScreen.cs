@@ -7,9 +7,12 @@ using XRL.World;
 using XRL.World.Parts;
 using QudUX.ScreenExtenders;
 using QudUX.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XRL.UI
 {
+    using SortGODisplayName = GameObject.DisplayNameSort;
+    using SortGOCategory = PickItem.SortGOCategory ;
     //This is based on the game code version of InventoryScreen.cs - there's some weirdness in here,
     //such as unused variables and unecessary code paths, labels, and interesting syntax choices that
     //I haven't edited in all cases. I've cleaned things up in a few places where I was making larger
@@ -25,8 +28,7 @@ namespace XRL.UI
         static List<GameObject> SortList;
         static List<string> Categories = new List<string>();
         public static SortGODisplayName displayNameSorter = new SortGODisplayName();
-        public static SortGOCategory categorySorter = new SortGOCategory();
-
+        // public static SortGOCategory categorySorter = new SortGOCategory();
         static int StartObject = 0;
         static int CategorySort = 0;
         static bool bMore = false;
@@ -44,6 +46,7 @@ namespace XRL.UI
         {
             TextConsole = console;
             Buffer = buffer;
+
         }
 
         public static void ClearLists()
@@ -89,7 +92,7 @@ namespace XRL.UI
                 {
 
                     string iCategory = Obj.GetInventoryCategory();
-                    if (bIsFiltered && !Obj.GetCachedDisplayNameStripped().Contains(FilterString, CompareOptions.IgnoreCase))
+                    if (bIsFiltered && !Obj.GetCachedDisplayNameForSort().Contains(FilterString, CompareOptions.IgnoreCase))
                     {
                         ItemsSkippedByFilter++;
                         continue;
@@ -139,7 +142,7 @@ namespace XRL.UI
             if (Categories[CategorySort] == "Category")
             {
                 SortList = pInventory.GetObjects();
-                SortList.Sort(categorySorter);
+                SortList.Sort(new SortGOCategory(new PickItem(), Objs, true));
             }
             else
             {
@@ -310,7 +313,7 @@ namespace XRL.UI
             Dictionary<char, int> ItemMap = new Dictionary<char, int>();
             bool bShowInventoryTiles = QudUX.Concepts.Options.UI.ViewInventoryTiles;
             List<GameObject> disabledObjectsWithImposters = null;
-            GameObject fakeTraderForPriceEval = GameObject.create("DromadTrader1");
+            GameObject fakeTraderForPriceEval = GameObject.Create("DromadTrader1");
 
             if (bShowInventoryTiles)
             {
@@ -571,7 +574,7 @@ namespace XRL.UI
                 Buffer.Goto(34, 24);
                 Buffer.Write("{{y|[{{W|?}} view keys]}}");
 
-                TextConsole.DrawBuffer(Buffer, ImposterManager.getImposterUpdateFrame()); //need to update imposters because we've toggled their visibility
+                TextConsole.DrawBuffer(Buffer, ImposterManager.getImposterUpdateFrame(Buffer)); //need to update imposters because we've toggled their visibility
                 if (!XRL.Core.XRLCore.Core.Game.Running)
                 {
                     if (bShowInventoryTiles)

@@ -7,6 +7,7 @@ using XRL.Core;
 using XRL.Rules;
 using XRL.Language;
 using XRL.World.Effects;
+using XRL.World.Conversations;
 using XRL.World.Encounters.EncounterObjectBuilders;
 using Options = QudUX.Concepts.Options;
 
@@ -98,7 +99,12 @@ namespace XRL.World.Parts
                         return false;
                     }
                     speaker = QudUX_ConversationHelper.ConversationPartner;
-                    convo = speaker.GetPart<ConversationScript>()?.customConversation;
+                    ConversationScript convoPart = speaker.GetPart<ConversationScript>();
+
+                    if(convoPart == null) return false;
+
+                    convo = new Conversation(convoPart.Blueprint);
+                    
                     if (convo == null)
                     {
                         return false;
@@ -114,6 +120,7 @@ namespace XRL.World.Parts
                 _debugSegmentCounter = 2;
 
                 //clean up old versions of the conversation if they exist
+                
                 if (convo.NodesByID.ContainsKey("*QudUX_RestockDiscussionNode"))
                 {
                     _debugSegmentCounter = 3;
