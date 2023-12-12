@@ -1,17 +1,12 @@
 === QudUX 2.0 Errors ===
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\LookExtender.cs(17,27): error CS0103: The name 'LegacyKeyMapping' does not exist in the current context
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\LookExtender.cs(22,32): error CS0103: The name 'LegacyKeyMapping' does not exist in the current context
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\EnhancedScoreBoard.cs(51,95): error CS1061: 'ScoreEntry2' does not contain a definition for 'Description' and no accessible extension method 'Description' accepting a first argument of type 'ScoreEntry2' could be found (are you missing a using directive or an assembly reference?)
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\EnhancedScoreBoard.cs(51,61): error CS7036: There is no argument given that corresponds to the required formal parameter 'Name' of 'ScoreEntry2.ScoreEntry2(int, string, long, string, string, int, string)'
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\CreateCharacterExtender.cs(70,22): error CS1061: 'HologramMaterial' does not contain a definition for 'Tile' and no accessible extension method 'Tile' accepting a first argument of type 'HologramMaterial' could be found (are you missing a using directive or an assembly reference?)
-<...>\Mods\CavesOfQud-QudUX-v2\Utilities\JournalUtilities.cs(37,91): error CS1503: Argument 9: cannot convert from 'string' to 'System.Collections.Generic.List<string>'
-
+ATT - <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\LookExtender.cs(17,27): error CS0103: The name 'LegacyKeyMapping' does not exist in the current context
+ATT - <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\LookExtender.cs(22,32): error CS0103: The name 'LegacyKeyMapping' does not exist in the current context
+ATT - <...>\Mods\CavesOfQud-QudUX-v2\Harmony Patches\Patch_XRL_UI_Look.cs(55,72): error CS0103: The name 'LookExtender_AddMarkLegendaryOptionToLooker' does not exist in the current context
+ATT - <...>\Mods\CavesOfQud-QudUX-v2\Harmony Patches\Patch_XRL_UI_Look.cs(70,72): error CS0103: The name 'LookExtender_CheckKeyPress' does not exist in the current context
 
 == Warnings ==
 <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\EnhancedScoreBoard.cs(186,20): warning CS0108: 'EnhancedScoreEntry.Level' hides inherited member 'ScoreEntry2.Level'. Use the new keyword if hiding was intended.
 <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\EnhancedScoreBoard.cs(188,23): warning CS0108: 'EnhancedScoreEntry.Version' hides inherited member 'ScoreEntry2.Version'. Use the new keyword if hiding was intended.
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\JournalScreenExtender.cs(73,87): warning CS0612: 'JournalMapNote.zoneid' is obsolete
-<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\JournalScreenExtender.cs(74,70): warning CS0612: 'JournalMapNote.zoneid' is obsolete
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_LegendaryInteractionListener.cs(94,36): warning CS0618: 'Factions.getIfExists(string)' is obsolete: 'use GetIfExists(), will be removed after Q2 2024'
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_LegendaryInteractionListener.cs(97,56): warning CS0618: 'Faction.getFormattedName()' is obsolete: 'Use GetFormattedName(), will be removed after Q2 2024'
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_LegendaryInteractionListener.cs(102,37): warning CS0618: 'Factions.getIfExists(string)' is obsolete: 'use GetIfExists(), will be removed after Q2 2024'
@@ -20,6 +15,8 @@
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_LegendaryInteractionListener.cs(115,60): warning CS0618: 'Faction.getFormattedName(string)' is obsolete: 'use GetFormattedName(), will be removed after Q2 2024'
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_ConversationHelper.cs(152,21): warning CS0618: 'Restocker' is obsolete: 'will be removed after Q4 2023'
 <...>\Mods\CavesOfQud-QudUX-v2\Parts and Effects\QudUX_ConversationHelper.cs(152,51): warning CS0618: 'Restocker' is obsolete: 'will be removed after Q4 2023'
+<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\JournalScreenExtender.cs(73,87): warning CS0612: 'JournalMapNote.zoneid' is obsolete
+<...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\JournalScreenExtender.cs(74,70): warning CS0612: 'JournalMapNote.zoneid' is obsolete
 <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\CharacterTileScreenExtender.cs(183,38): warning CS0618: 'GamePartBlueprint.Parameters.get' is obsolete: 'Parameters are now stored parsed.  Use TryGetParameter<T> to get the parsed value, or GetParameterString() to get the original string.  If you really need a full iterator for Parameters to strings, use GetParameterStrings() -- Will remove Q2 2023'
 <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\CharacterTileScreenExtender.cs(183,89): warning CS0618: 'GamePartBlueprint.Parameters.get' is obsolete: 'Parameters are now stored parsed.  Use TryGetParameter<T> to get the parsed value, or GetParameterString() to get the original string.  If you really need a full iterator for Parameters to strings, use GetParameterStrings() -- Will remove Q2 2023'
 <...>\Mods\CavesOfQud-QudUX-v2\Screen Extenders\CharacterTileScreenExtender.cs(205,38): warning CS0618: 'GamePartBlueprint.Parameters.get' is obsolete: 'Parameters are now stored parsed.  Use TryGetParameter<T> to get the parsed value, or GetParameterString() to get the original string.  If you really need a full iterator for Parameters to strings, use GetParameterStrings() -- Will remove Q2 2023'

@@ -52,7 +52,7 @@ namespace QudUX.HarmonyPatches
                         yield return Sequence1.MatchedInstructions[2].Clone(); //load ScreenBuffer
                         yield return Sequence1.MatchedInstructions[7].Clone(); //load target GameObject
                         yield return Sequence1.MatchedInstructions[4].Clone(); //load Look UI hotkey string
-                        yield return new CodeInstruction(OpCodes.Call, LookExtender_AddMarkLegendaryOptionToLooker);
+                        // yield return new CodeInstruction(OpCodes.Call, LookExtender_AddMarkLegendaryOptionToLooker);
                         seq++;
                         continue;
                     }
@@ -67,7 +67,7 @@ namespace QudUX.HarmonyPatches
                         yield return instruction; //load pressed key onto stack (with existing label)
                         yield return Sequence1.MatchedInstructions[7].Clone(); //load target GameObject
                         yield return new CodeInstruction(OpCodes.Ldloc_1); //load flag on the stack
-                        yield return new CodeInstruction(OpCodes.Call, LookExtender_CheckKeyPress); //call our method, which puts a bool on stack
+                        // yield return new CodeInstruction(OpCodes.Call, LookExtender_CheckKeyPress); //call our method, which puts a bool on stack
                         yield return new CodeInstruction(OpCodes.Stloc_1); //store bool into flag
                         yield return replacementInstruction; //return original instruction (without label)
                         patched = true;
