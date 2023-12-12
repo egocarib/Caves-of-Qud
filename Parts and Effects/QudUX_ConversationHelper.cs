@@ -14,6 +14,7 @@ using Options = QudUX.Concepts.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
+    [HasConversationDelegate]
     public class QudUX_ConversationHelper : IPart
     {
         public static GameObject PlayerBody = null;
@@ -101,10 +102,10 @@ namespace XRL.World.Parts
                     speaker = QudUX_ConversationHelper.ConversationPartner;
                     ConversationScript convoPart = speaker.GetPart<ConversationScript>();
 
-                    if(convoPart == null) return false;
+                    if (convoPart == null) return false;
 
                     convo = new Conversation(convoPart.Blueprint);
-                    
+
                     if (convo == null)
                     {
                         return false;
@@ -120,20 +121,23 @@ namespace XRL.World.Parts
                 _debugSegmentCounter = 2;
 
                 //clean up old versions of the conversation if they exist
-                
-                if (convo.NodesByID.ContainsKey("*QudUX_RestockDiscussionNode"))
+
+                if (convo.GetElementByID("*QudUX_RestockDiscussionNode") is Node elem && elem != null)
                 {
                     _debugSegmentCounter = 3;
-                    convo.NodesByID.Remove("*QudUX_RestockDiscussionNode");
-                    if (convo.NodesByID.ContainsKey("Start"))
+                    convo.Elements.Remove(elem);
+                    Node start = convo.GetStart();
+
+                    if (start != null)
                     {
+                        List<Choice> startChoices = start.GetChoices();
                         _debugSegmentCounter = 4;
-                        for (int i = 0; i < convo.NodesByID["Start"].Choices.Count; i++)
+
+                        for (int i = 0; i < startChoices.Count; i++)
                         {
-                            if (convo.NodesByID["Start"].Choices[i].ID == "*QudUX_RestockerDiscussionStartChoice")
+                            if (startChoices[i].ID == "*QudUX_RestockerDiscussionStartChoice")
                             {
-                                convo.NodesByID["Start"].Choices.RemoveAt(i);
-                                break;
+                                convo.Elements.Remove(startChoices[i]);
                             }
                         }
                     }
@@ -239,34 +243,49 @@ namespace XRL.World.Parts
                 _debugSegmentCounter = 18;
 
                 //add options to ask location of quest givers for whom the quest has already started
-                if (convo.NodesByID.ContainsKey("Start"))
+                if (convo.GetElementByID("Start") != null)
                 {
                     _debugSegmentCounter = 19;
                     //create node with info about trading
                     string restockNodeID = "*QudUX_RestockDiscussionNode";
-                    ConversationNode restockNode = ConversationsAPI.newNode(restockDialog, restockNodeID);
+
                     _debugSegmentCounter = 20;
-                    restockNode.AddChoice("I have more to ask.", "Start", null);
-                    restockNode.AddChoice("Live and drink.", "End", null);
-                    convo.AddNode(restockNode);
+
+                    Node n = convo.AddNode(restockNodeID, restockDialog);
+                    n.AddChoice(null, "I have more to ask", "Start");
+                    n.AddChoice(null, "Live and drink.", "End");
+
                     _debugSegmentCounter = 21;
-                    ConversationNode startNode = convo.NodesByID["Start"];
+                    Node startNode = convo.GetStart();
                     int rand = Stat.Random(1, 3);
                     _debugSegmentCounter = 22;
-                    ConversationChoice askRestockChoice = new ConversationChoice
+
+                    Choice askRestockChoice = new Choice
                     {
                         ID = "*QudUX_RestockerDiscussionStartChoice",
                         Text = (rand == 1) ? "Any new wares on the way?"
                             : (rand == 2) ? "Do you have anything else to sell?"
                             : "Can you let me know if you get any new stock?",
-                        GotoID = restockNodeID,
-                        ParentNode = startNode,
+                        Target = restockNodeID,
+                        Parent = startNode,
                         Ordinal = 991 //set to make this appear immediately after the trade option
                     };
+
                     _debugSegmentCounter = 23;
-                    startNode.Choices.Add(askRestockChoice);
+                    // startNode.Choices.Add(askRestockChoice);
+
+                    Choice newChoice = startNode.AddChoice(
+                        "*QudUX_RestockerDiscussionStartChoice",
+                        (rand == 1) ? "Any new wares on the way?" :
+                        (rand == 2) ? "Do you have anything else to sell?" : "Can you let me know if you get any new stock?",
+                        restockNodeID
+                    );
+
+                    newChoice.Parent = startNode;
+                    newChoice.Ordinal = 991;
+
                     _debugSegmentCounter = 24;
-                    startNode.Choices.Sort();
+                    // startNode.Choices.Sort();
                     _debugSegmentCounter = 25;
                 }
                 _debugSegmentCounter = 26;
@@ -314,53 +333,42 @@ namespace XRL.World.Parts
             }
 
             //add options to ask location of quest givers for whom the quest has already started
-            if (ActiveQuestHolders.Count > 0 && convo.NodesByID.ContainsKey("Start"))
+            if (ActiveQuestHolders.Count > 0 && convo.GetElementByID("Start") != null)
             {
                 string nameList = this.BuildQuestGiverNameList(ActiveQuestHolders);
-                ConversationNode cNode = convo.NodesByID["Start"];
+                Node cNode = convo.GetElementByID("Start") as Node;
                 this.RemoveOldQudUXChoices(cNode);
-                ConversationChoice cChoice = new ConversationChoice
-                {
-                    Text = this.StatementLocationOf(nameList),
-                    GotoID = "End",
-                    ParentNode = cNode,
-                    Execute = "XRL.World.Parts.QudUX_ConversationHelper:ApplyActiveQuestGiverEffect" //function to execute when this choice is selected.
-                };
-                cNode.Choices.Add(cChoice);
+
+                Choice c = cNode.AddChoice(null, this.StatementLocationOf(nameList), "End");
+                c.Parent = cNode;
+                c.Actions.Add("ApplyNewQuestGiverEffect", null);
             }
-            if (NewQuestHolders.Count > 0 && convo.NodesByID.ContainsKey("*DynamicQuestSignpostConversationIntro"))
+            if (NewQuestHolders.Count > 0 && convo.GetElementByID("*DynamicQuestSignpostConversationIntro") != null)
             {
                 string nameList = this.BuildQuestGiverNameList(NewQuestHolders);
-                ConversationNode cNode = convo.NodesByID["*DynamicQuestSignpostConversationIntro"];
+                Node cNode = convo.GetElementByID("*DynamicQuestSignpostConversationIntro") as Node;
                 this.RemoveOldQudUXChoices(cNode);
-                ConversationChoice cChoice = new ConversationChoice
-                {
-                    Text = this.QuestionLocationOf(nameList, NewQuestHolders.Count > 1),
-                    GotoID = "End",
-                    ParentNode = cNode,
-                    Execute = "XRL.World.Parts.QudUX_ConversationHelper:ApplyNewQuestGiverEffect" //function to execute when this choice is selected.
-                };
-                cNode.Choices.Add(cChoice);
+
+                Choice c = cNode.AddChoice(null, this.QuestionLocationOf(nameList, NewQuestHolders.Count > 1), "End");
+                c.Parent = cNode;
+                c.Actions.Add("ApplyNewQuestGiverEffect", null);
             }
             return true;
         }
 
-        public void RemoveOldQudUXChoices(ConversationNode cNode)
+        public void RemoveOldQudUXChoices(Node cNode)
         {
-            if (cNode == null || cNode.Choices == null)
+            List<Choice> choices = cNode.GetChoices();
+            if (cNode == null || choices == null)
             {
                 return;
             }
-            for (int i = cNode.Choices.Count - 1; i >= 0; i--)
+            for (int i = choices.Count - 1; i >= 0; i--)
             {
-                ConversationChoice cChoice = cNode.Choices[i];
-                if (cChoice != null && cChoice.Execute != null && cChoice.Execute.Contains(":"))
+                Choice cChoice = choices[i];
+                if (cChoice != null && cChoice.Actions != null && cChoice.Actions.ContainsKey("ApplyActiveQuestGiverEffect"))
                 {
-                    string executeType = cChoice.Execute.Split(':')[0];
-                    if (executeType == "XRL.World.Parts.QudUX_ConversationHelper")
-                    {
-                        cNode.Choices.RemoveAt(i);
-                    }
+                    choices.RemoveAt(i);
                 }
             }
         }
@@ -400,9 +408,24 @@ namespace XRL.World.Parts
         }
 
         //Called dynamically by game from ConversationChoice.Execute string:
-        public static bool ApplyActiveQuestGiverEffect()
+
+        /*  VÉ.AISSE BUGFIXES
+
+            Not sure if this delegate was supposed to be a simple action or a predicate
+            Qud API will make it a predicate (see XLR.World.Conversations.ConversationDelegates -> LoadDelegates)
+            But I don't know if it's supposed to work that way since the way conversations work seems to have
+            changed a lot since QudUX development
+
+            I changed the return type so that Qud API makes it an action. I don't see why this should be anything
+            but an action.
+
+            I also had to change signature to match ActionReceiver format 
+
+        */
+        [ConversationDelegate]
+        public static void ApplyActiveQuestGiverEffect(DelegateContext context)
         {
-            return ApplyQuestGiverEffect(QudUX_ConversationHelper.ActiveQuestHolders);
+            ApplyQuestGiverEffect(QudUX_ConversationHelper.ActiveQuestHolders);
         }
 
         public static bool ApplyQuestGiverEffect(List<GameObject> QuestGivers)
@@ -411,10 +434,10 @@ namespace XRL.World.Parts
             {
                 int randNum = Stat.Random(1, 3);
                 Popup.Show(QudUX_ConversationHelper.ConversationPartner.The
-                          + QudUX_ConversationHelper.ConversationPartner.DisplayNameOnly  + "&y "
+                          + QudUX_ConversationHelper.ConversationPartner.DisplayNameOnly + "&y "
                           + ((randNum == 1) ? "points you in the right direction."
                             : (randNum == 2) ? "gives you a rough layout of the area."
-                            : "gestures disinterestedly, sending you on your way.") );
+                            : "gestures disinterestedly, sending you on your way."));
             }
             if (QudUX_ConversationHelper.PlayerBody != null && QudUX_ConversationHelper.PlayerBody == XRLCore.Core.Game.Player.Body)
             {
