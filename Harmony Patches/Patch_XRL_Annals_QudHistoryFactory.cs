@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -29,10 +29,18 @@ namespace QudUX.HarmonyPatches
         static Type QudHistoryFactoryType = AccessTools.TypeByName("XRL.Annals.QudHistoryFactory");
 
         /// <summary>
+        /// 
+        /// Calculate target method. QudHistoryFactory is not longer internal, but
+        /// method signature contains out parameters, which require MakeByRefType()
+        /// to be used, and it cannot be called within HarmonyTargetMethod attribute
+        /// 
+        /// 
+        /// *************** OLD
         /// Calculate target method. This is necessary because QudHistoryFactory is an internal type, so we
         /// can't simply use typeof() on it and put it in the HarmonyPatch attribute.
+        /// ***************
+        /// 
         /// </summary>
-        [HarmonyTargetMethod]
         static MethodBase TargetMethod()
         {
             return QudHistoryFactoryType.GetMethod("NameRuinsSite", 
@@ -43,6 +51,12 @@ namespace QudUX.HarmonyPatches
                     typeof(string).MakeByRefType()
                 }
             );
+        }
+
+        [HarmonyPrepare]
+        static void Prepare()
+        {
+            Harmony.DEBUG = true;
         }
 
         /// <summary>
@@ -74,6 +88,7 @@ namespace QudUX.HarmonyPatches
         [HarmonyTranspiler]
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+            Log("Transpiling ruin naming");
             //QudHistoryFactory.NameRuinsSite takes Stat.Random(0, 80) and then if the value is not less than
             //60, it returns "some forgotten ruins" as the name of a ruins site. To patch this function, we
             //will find the "Stat.Random(0, 80)" code, and replace it with "Stat.Random(0, 59)" which will

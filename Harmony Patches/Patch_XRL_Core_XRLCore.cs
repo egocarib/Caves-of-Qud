@@ -47,14 +47,14 @@ namespace QudUX.HarmonyPatches
     [HarmonyPatch(typeof(XRL.Core.XRLCore))]
     class Patch_XRL_Core_XRLCore
     {
-        [HarmonyPostfix]
-        [HarmonyPatch("LoadGame")]
-        static void Postfix()
+        [HarmonyPrefix]
+        [HarmonyPatch("RunGame")]
+        static void Prefix()
         {
             try
             {
                 QudUX.Concepts.Events.SaveLoadEvent();
-                QudUX.Concepts.Events.OnLoadAlwaysEvent();
+                QudUX.Concepts.Events.OnGameRuns();
             }
             catch { }
         }

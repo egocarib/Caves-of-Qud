@@ -1,17 +1,50 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection.Emit;
 using System.Collections.Generic;
 using HarmonyLib;
 using static QudUX.HarmonyPatches.PatchHelpers;
 using static QudUX.Concepts.Constants.MethodsAndFields;
+using System.Reflection;
+using System.Drawing;
+using XRL.World;
 
 namespace QudUX.HarmonyPatches
 {
-    [HarmonyPatch(typeof(XRL.World.GameObject))]
+    [HarmonyPatch]
     class Patch_XRL_World_GameObject_Move
     {
+        static Type QudGameObjectType = AccessTools.TypeByName("XRL.World.GameObject");
+
+        static MethodInfo TargetMethod()
+        {
+            return QudGameObjectType.GetMethod("Move",
+                //So sorry for this
+                new Type[] 
+                {
+                    typeof(string),
+                    typeof(GameObject).MakeByRefType(),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(GameObject),
+                    typeof(GameObject),
+                    typeof(bool),
+                    typeof(int?),
+                    typeof(string),
+                    typeof(int?),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(GameObject),
+                    typeof(GameObject),
+                }
+            );
+        }
+
         [HarmonyTranspiler]
-        [HarmonyPatch("Move")]
         static IEnumerable<CodeInstruction> Transpiler_Move1(IEnumerable<CodeInstruction> instructions)
         {
             var Sequence = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
@@ -35,7 +68,6 @@ namespace QudUX.HarmonyPatches
         }
 
         [HarmonyTranspiler]
-        [HarmonyPatch("Move")]
         static IEnumerable<CodeInstruction> Transpiler_Move2(IEnumerable<CodeInstruction> instructions)
         {
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
