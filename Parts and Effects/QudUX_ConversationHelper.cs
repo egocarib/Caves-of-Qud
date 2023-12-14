@@ -401,15 +401,7 @@ namespace XRL.World.Parts
             return ConsoleLib.Console.ColorUtility.StripFormatting(nameList);
         }
 
-        //Called dynamically by game from ConversationChoice.Execute string:
-        public static bool ApplyNewQuestGiverEffect()
-        {
-            return ApplyQuestGiverEffect(QudUX_ConversationHelper.NewQuestHolders);
-        }
-
-        //Called dynamically by game from ConversationChoice.Execute string:
-
-        /*  VÉ.AISSE BUGFIXES
+                /*  VÉ.AISSE BUGFIXES
 
             Not sure if this delegate was supposed to be a simple action or a predicate
             Qud API will make it a predicate (see XLR.World.Conversations.ConversationDelegates -> LoadDelegates)
@@ -422,6 +414,22 @@ namespace XRL.World.Parts
             I also had to change signature to match ActionReceiver format 
 
         */
+
+        //Called dynamically by game from ConversationChoice.Execute string:
+        [ConversationDelegate]
+        public static void ApplyNewQuestGiverEffect(DelegateContext context)
+        {
+            ApplyQuestGiverEffect(QudUX_ConversationHelper.NewQuestHolders);
+        }
+
+        //Called dynamically by game from ConversationChoice.Execute string:
+
+        /*
+
+            Same as above
+
+        */
+
         [ConversationDelegate]
         public static void ApplyActiveQuestGiverEffect(DelegateContext context)
         {
