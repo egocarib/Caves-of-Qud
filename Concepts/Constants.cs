@@ -222,7 +222,7 @@ namespace QudUX.Concepts
             }
             public static MethodInfo Events_OnLoadAlwaysEvent
             {
-                get { return GetMethodInfo(() => QudUX.Concepts.Events.OnLoadAlwaysEvent()); }
+                get { return GetMethodInfo(() => QudUX.Concepts.Events.OnGameRuns()); }
             }
             // public static MethodInfo LookExtender_AddMarkLegendaryOptionToLooker
             // {
