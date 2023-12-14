@@ -7,20 +7,20 @@ See the readme of the [original repo](https://github.com/egocarib/CavesOfQud-Qud
 All API errors have been fixed, excepted some key mapping related code that might require bigger refactoring. I decided to cut the whole feature to be able to test everything else.
 
 ### Non-Patch Related
-✔ Revamped UI text inventory working
-✖ Restocker / Merchants additional dialog 
-✖ Hero journal note not working
+✔ Revamped UI text inventory working<br>
+❌ Restocker / Merchants additional dialog <br>
+❌ Hero journal note not working<br>
 
 Probably other things I didn't yet discovered
 
 ### Patches
-✔ Patch_XRL_Annals_QudHistoryFactory
-✔ Patch_XRL_Core_XRLCore
-✔ Patch_XRL_UI_AbilityManager
-✔ Patch_XRL_World_Parts_Mutation_MagneticPulse
+✔ Patch_XRL_Annals_QudHistoryFactory<br>
+✔ Patch_XRL_Core_XRLCore<br>
+✔ Patch_XRL_UI_AbilityManager<br>
+✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br>
 
-✖ Patch_XRL_Core_Scores
-✖ Patch_XRL_World_GameObject_Move (1/2)
-✖ Patch_XRL_UI_Look
-✖ Patch_XRL_World_Parts_Campfire
-✖ Patch_XRL_World_Parts_Physics
+❌ Patch_XRL_Core_Scores<br>
+❌ Patch_XRL_World_GameObject_Move (1/2)<br>
+❌ Patch_XRL_UI_Look<br>
+❌ Patch_XRL_World_Parts_Campfire<br>
+❌ Patch_XRL_World_Parts_Physics<br>
