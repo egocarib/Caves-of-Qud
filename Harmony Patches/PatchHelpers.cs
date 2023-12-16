@@ -151,7 +151,7 @@ namespace QudUX.HarmonyPatches
                     }
                     else
                     {
-                        isMatch = (instruction.opcode == Instructions[CurrentIndex].Instruction.opcode);
+                        isMatch = instruction.opcode == Instructions[CurrentIndex].Instruction.opcode;
                     }
 
                     if (isMatch)

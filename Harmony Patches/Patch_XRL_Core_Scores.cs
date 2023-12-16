@@ -11,12 +11,13 @@ namespace QudUX.HarmonyPatches
     {
         [HarmonyTranspiler]
         [HarmonyPatch("Show")]
+        [HarmonyDebug]
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
                 new PatchTargetInstruction(OpCodes.Ldc_I4_S, (object)62),
-                new PatchTargetInstruction(OpCodes.Ldc_I4_S, (object)24, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_S, 24, 0),
                 new PatchTargetInstruction(OpCodes.Callvirt, 0), //ScreenBuffer.Goto
                 new PatchTargetInstruction(OpCodes.Pop, 0),
                 new PatchTargetInstruction(OpCodes.Ldsfld, 0),
@@ -24,7 +25,8 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
-                new PatchTargetInstruction(OpCodes.Callvirt, ScreenBuffer_Write, 0),
+                new PatchTargetInstruction(OpCodes.Ldnull, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, ScreenBuffer_Write, 1),
                 new PatchTargetInstruction(OpCodes.Pop, 0),
             });
             var Sequence2 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
@@ -57,7 +59,8 @@ namespace QudUX.HarmonyPatches
                         yield return Sequence1.MatchedInstructions[6].Clone();
                         yield return Sequence1.MatchedInstructions[7].Clone();
                         yield return Sequence1.MatchedInstructions[8].Clone();
-                        yield return Sequence1.MatchedInstructions[9].Clone();
+                        yield return Sequence1.MatchedInstructions[9].Clone(); //Vé.aisse update -- Adding a ldnull to fit new screenbuffer.write signature
+                        yield return Sequence1.MatchedInstructions[10].Clone();
                         seq++;
                     }
                 }

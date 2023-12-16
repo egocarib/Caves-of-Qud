@@ -53,12 +53,6 @@ namespace QudUX.HarmonyPatches
             );
         }
 
-        [HarmonyPrepare]
-        static void Prepare()
-        {
-            Harmony.DEBUG = true;
-        }
-
         /// <summary>
         /// Postfix patch. Prevents duplicate ruins names from being generated - tries to generate a new name if
         /// the name has already been used. This is surprisingly common (especially after we remove "some
