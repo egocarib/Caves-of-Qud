@@ -341,7 +341,7 @@ namespace XRL.World.Parts
 
                 Choice c = cNode.AddChoice(null, this.StatementLocationOf(nameList), "End");
                 c.Parent = cNode;
-                c.Actions.Add("ApplyNewQuestGiverEffect", null);
+                c.Actions = new Dictionary<string, string>{{ "ApplyNewQuestGiverEffect", null}};
             }
             if (NewQuestHolders.Count > 0 && convo.GetElementByID("*DynamicQuestSignpostConversationIntro") != null)
             {
@@ -351,7 +351,7 @@ namespace XRL.World.Parts
 
                 Choice c = cNode.AddChoice(null, this.QuestionLocationOf(nameList, NewQuestHolders.Count > 1), "End");
                 c.Parent = cNode;
-                c.Actions.Add("ApplyNewQuestGiverEffect", null);
+                c.Actions = new Dictionary<string, string>{{ "ApplyNewQuestGiverEffect", null}};
             }
             return true;
         }
