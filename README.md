@@ -22,9 +22,10 @@ Probably other things I didn't yet discovered
 ✔ Patch_XRL_Core_XRLCore<br>
 ✔ Patch_XRL_UI_AbilityManager<br>
 ✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br>
+
 ⚠️ Patch_XRL_Core_Scores - **No Loading errors but not working**<br>
 
-❌ Patch_XRL_World_GameObject_Move (1/2)<br>
+❌ Patch_XRL_World_GameObject_Move<br>
 ❌ Patch_XRL_UI_Look<br>
 ❌ Patch_XRL_World_Parts_Campfire<br>
 ❌ Patch_XRL_World_Parts_Physics<br>
