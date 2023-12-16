@@ -19,11 +19,11 @@ Probably other things I didn't yet discovered
 
 ### Patches
 ✔ Patch_XRL_Annals_QudHistoryFactory<br>
-✔ Patch_XRL_Core_XRLCore<br>
 ✔ Patch_XRL_UI_AbilityManager<br>
-✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br>
+✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br><br>
 
-⚠️ Patch_XRL_Core_Scores - **No Loading errors but not working**<br>
+⚠️ Patch_XRL_Core_Scores    - **No patching errors but not working**<br>
+⚠️ Patch_XRL_Core_XRLCore   - **No patching errors but not working**<br><br>
 
 ❌ Patch_XRL_World_GameObject_Move<br>
 ❌ Patch_XRL_UI_Look<br>
