@@ -24,23 +24,14 @@ namespace QudUX.Concepts
         {
 
         }
-
         
-        /*
-            I took the liberty to rename the method and change the patch in which it is used.
-            Since all it does is adding parts to the player, I just hooked it
-            at some point where I knew the player would be here, i.e. prefixing method
-            XRL.Core.XRLCore::RunGame()
+        //Runs in all load scenarios - called immediately after each of the events above.
+        public static void AlwaysLoadEvent() => AlwaysLoadEvent("Starting game");
 
-            XRL.Core.XRLCore::LoadGame doesn't exist anymore and loading appears to 
-            work in a way that makes debugging more tedious than just changing the hook.
-            I'm a lazy developper.
-
-            ************ OLD COMMENT
-            Runs in all load scenarios - called immediately after each of the events above.
-        */
-        public static void OnGameRuns()
+        public static void AlwaysLoadEvent(string context)
         {
+            Utilities.Logger.Log("[QUDUX] Requiring parts on player from " + context);
+
             if (Player != null)
             {
                 Player.RequirePart<QudUX_AutogetHelper>();
@@ -50,8 +41,16 @@ namespace QudUX.Concepts
             }
             else
             {
-                QudUX.Utilities.Logger.Log("Couldn't require part on player because reference is null. QudUX.Concepts::Events.OnGameRuns()");
+                Utilities.Logger.Log("Couldn't require part on player because reference is null. QudUX.Concepts.Events::OnGameRuns()");
             }
+
+
+            if(Player == null) return;
+
+            foreach(IPart p in Player.LoopParts())
+            {
+                Utilities.Logger.Log(p.DebugName);
+            };
         }
     }
 }
