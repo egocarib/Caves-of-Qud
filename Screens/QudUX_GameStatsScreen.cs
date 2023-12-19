@@ -83,7 +83,7 @@ namespace XRL.UI
                     return ScreenReturn.Exit;
                 }
 
-				if ((keys == Keys.Enter) && (currentPage == StatsPage.GamesList))
+				if (keys == Keys.Enter || keys == Keys.Space && (currentPage == StatsPage.GamesList))
 				{
 					EnhancedScoreEntry esh = ScoreList[scoreTable.Offset + scoreTable.SelectedIndex];
 					QudUX_GameDetailsScreen detailsScreen = new QudUX_GameDetailsScreen();

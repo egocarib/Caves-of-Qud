@@ -7,7 +7,6 @@ using XRL.World;
 using XRL.World.Parts;
 using QudUX.ScreenExtenders;
 using QudUX.Utilities;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XRL.UI
 {
@@ -718,7 +717,7 @@ namespace XRL.UI
                     }
                 }
                 else
-                if (keys == Keys.Subtract || keys == Keys.OemMinus)
+                if (keys == Keys.Subtract || keys == Keys.OemMinus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Negative"))
                 {
                     foreach (QudUX_InventoryCategory Cat in CategoryList.Values)
                     {
@@ -726,7 +725,7 @@ namespace XRL.UI
                         SavedInventoryState.SetExpandState(Cat.Name, false);
                     }
                 }
-                else if (keys == Keys.Add || keys == Keys.Oemplus)
+                else if (keys == Keys.Add || keys == Keys.Oemplus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Positive"))
                 {
                     foreach (QudUX_InventoryCategory Cat in CategoryList.Values)
                     {

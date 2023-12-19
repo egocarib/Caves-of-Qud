@@ -51,7 +51,7 @@ namespace QudUX.ScreenExtenders
         public EnhancedScoreEntry(ScoreEntry2 scoreEntry) : base(scoreEntry.Score, scoreEntry.Details, scoreEntry.Turns, scoreEntry.GameId, scoreEntry.GameMode, scoreEntry.Level, scoreEntry.Name)
         {
 
-            if ((scoreEntry == null) || (string.IsNullOrEmpty(scoreEntry.Details)))
+            if (scoreEntry == null || string.IsNullOrEmpty(scoreEntry.Details))
                 return;
                 
             CopyFields(scoreEntry);
@@ -168,7 +168,7 @@ namespace QudUX.ScreenExtenders
 
         private string RemoveEffect(string part)
         {
-            string[] effects = new string[] { "bloody","slimy" ,"tarred", "salty"};
+            string[] effects = new string[] { "bloody","slimy" ,"tarred", "salty", "soupy", "implanted", "unctuous", "wet", "dilute", "oily", "sugary"};
             foreach(var e in effects)
             {
                 part = part.Replace(e,"");

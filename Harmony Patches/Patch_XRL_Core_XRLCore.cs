@@ -73,17 +73,10 @@ namespace QudUX.HarmonyPatches
 
         [HarmonyPostfix]
         [HarmonyPatch("LoadGame")]
-        static void Postfix()
+        static void LoadGamePostFix()
         {
-            try
-            {
-                QudUX.Concepts.Events.SaveLoadEvent();
-                QudUX.Concepts.Events.AlwaysLoadEvent("load everything");
-            }
-            catch(System.Exception e) 
-            {
-                Utilities.Logger.Log(e.Message);
-            }
+            Concepts.Events.SaveLoadEvent();
+            Concepts.Events.AlwaysLoadEvent("load everything");
         }
     }
 }

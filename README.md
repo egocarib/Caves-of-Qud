@@ -9,9 +9,9 @@ All API errors have been fixed, excepted some key mapping related code that migh
 ### Non-Patch Related
 ✔ Revamped UI text inventory<br>
 ✔ Quest Giver location markers<br>
-❌ Modify character sprite<br>
-❌ Open Autoget settings<br>
-❌ Display Game Statistics<br>
+✔ Modify character sprite<br>
+✔ Open Autoget settings<br>
+✔ Display Game Statistics<br>
 ❌ Restocker / Merchants additional dialog <br>
 ❌ Hero locations addition to journal<br>
 
@@ -20,10 +20,9 @@ Probably other things I didn't yet discovered
 ### Patches
 ✔ Patch_XRL_Annals_QudHistoryFactory<br>
 ✔ Patch_XRL_UI_AbilityManager<br>
-✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br><br>
-
-⚠️ Patch_XRL_Core_Scores    - **No patching errors but not working**<br>
-⚠️ Patch_XRL_Core_XRLCore   - **No patching errors but not working**<br><br>
+✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br>
+✔ Patch_XRL_Core_XRLCore<br>
+✔ Patch_XRL_Core_Scores<br><br>
 
 ❌ Patch_XRL_World_GameObject_Move<br>
 ❌ Patch_XRL_UI_Look<br>

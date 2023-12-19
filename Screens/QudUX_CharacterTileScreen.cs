@@ -340,17 +340,40 @@ namespace XRL.UI
 
         private void ShowHPOptionColorWarning()
         {
-            if (XRL.UI.Options.HPColor && !HPColorWarningShown)
+            if(HPColorWarningShown) return;
+
+            string optionMsg = "";
+
+            if(Options.HPColor)
             {
-                string optionDescription = XRL.UI.Options.OptionsByID["Option@HPColor"].DisplayText;
-                if (optionDescription.EndsWith("."))
-                {
-                    optionDescription = optionDescription.Remove(optionDescription.Length - 1);
-                }
-                Popup.Show("Note: You have the {{C|" + optionDescription + "}} option turned on, so "
-                    + "the game will ignore any primary color chosen for your sprite.", LogMessage: false);
+                optionMsg += DeleteEndPeriod(Options.OptionsByID["Option@HPColor"].DisplayText) + " option";
             }
+
+            if(Options.AlwaysHPColor)
+            {
+                if(!optionMsg.IsNullOrEmpty()) 
+                {
+                    optionMsg +=" and the";
+                }
+
+                optionMsg += " "+ DeleteEndPeriod(Options.OptionsByID["Option@AlwaysHPColor"].DisplayText) + " option";
+            }
+            
+                
+            Popup.Show("Note: You have the {{C|" + optionMsg + "}} turned on, so "
+                + "the game will ignore any primary color chosen for your sprite.",
+                LogMessage: false
+            );
+
             HPColorWarningShown = true;
+        }
+
+        private string DeleteEndPeriod(string target)
+        {
+            if(target.EndsWith("."))
+                target = target.Remove(target.Length - 1);
+                
+            return target;
         }
 
         private void UpdateSearchString(ref string filter)
