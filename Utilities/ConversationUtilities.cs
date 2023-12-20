@@ -6,12 +6,12 @@ namespace XRL.World.Conversations
 
     public static class ConversationElementExtensions
     {
-        public static List<Node> GetNodes(this IConversationElement elem)
+        public static List<Node> VeAisse_GetNodes(this IConversationElement elem)
         {
             return GetChildOfType<Node>(elem);
         }
 
-        public static List<Choice> GetChoices(this IConversationElement elem)
+        public static List<Choice> VeAisse_GetChoices(this IConversationElement elem)
         {
             return GetChildOfType<Choice>(elem);
         }

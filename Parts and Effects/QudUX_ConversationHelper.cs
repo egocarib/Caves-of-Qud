@@ -10,6 +10,9 @@ using XRL.World.Effects;
 using XRL.World.Conversations;
 using XRL.World.Encounters.EncounterObjectBuilders;
 using Options = QudUX.Concepts.Options;
+using QudUXLogger = QudUX.Utilities.Logger;
+using Battlehub.UIControls;
+using XRL.Messages;
 
 namespace XRL.World.Parts
 {
@@ -22,6 +25,8 @@ namespace XRL.World.Parts
         public static List<GameObject> NewQuestHolders = new List<GameObject>();
         public static List<GameObject> ActiveQuestHolders = new List<GameObject>();
         public static List<GameObject> ZoneTradersTradedWith = new List<GameObject>();
+        public const string QudUX_RestockDiscussionNodeID = "*QudUX_RestockDiscussionNode";
+        public const string QudUX_RestockerDiscussionStartChoiceID = "*QudUX_RestockerDiscussionStartChoice";
         public static string CurrentInteractionZoneID = string.Empty;
 
         public override bool AllowStaticRegistration()
@@ -51,11 +56,16 @@ namespace XRL.World.Parts
                     }
                     string questID = speaker.GetStringProperty("GivesDynamicQuest", string.Empty);
                     Conversation convo = E.GetParameter<Conversation>("Conversation");
+                    QudUXLogger.Log("conversation is " + (convo != null ? "not null" : "null"));
+                    
                     if (speaker.HasPart("GenericInventoryRestocker") || speaker.HasPart("Restocker"))
                     {
                         try
                         {
-                            QudUX_ConversationHelper.AddChoiceToRestockers(convo, speaker);
+                            QudUXLogger.Log("Started Conversation with restocker, adding conversation choices");
+                            bool res = QudUX_ConversationHelper.AddChoiceToRestockers(convo, speaker);
+                            QudUXLogger.Log("Choices addition " + (res ? "Succeeded" : "failed"));
+
                         }
                         catch (Exception ex)
                         {
@@ -80,102 +90,114 @@ namespace XRL.World.Parts
 
         public static void SetTraderInteraction(GameObject trader)
         {
-            QudUX_ConversationHelper.ZoneTradersTradedWith.Add(trader);
-            QudUX_ConversationHelper.AddChoiceToRestockers();
+            ZoneTradersTradedWith.Add(trader);
+            bool res = QudUX_ConversationHelper.AddChoiceToRestockers();
+            QudUXLogger.Log("Choices addition " + (res ? "Succeeded" : "failed"));
         }
 
         public static bool AddChoiceToRestockers(Conversation convo = null, GameObject speaker = null)
         {
             if (!Options.Conversations.AskAboutRestock)
             {
+                QudUXLogger.Log("because false option is disabled");
                 return false;
             }
+
             int _debugSegmentCounter = 0;
+
             try
             {
                 if (speaker == null)
                 {
-                    if (QudUX_ConversationHelper.ConversationPartner == null)
+                    speaker = ConversationUI.Speaker;
+                    if(speaker == null)
                     {
-                        return false;
-                    }
-                    speaker = QudUX_ConversationHelper.ConversationPartner;
-                    ConversationScript convoPart = speaker.GetPart<ConversationScript>();
-
-                    if (convoPart == null) return false;
-
-                    convo = new Conversation(convoPart.Blueprint);
-
-                    if (convo == null)
-                    {
+                        QudUXLogger.Log("speaker is null");
                         return false;
                     }
                 }
+
                 _debugSegmentCounter = 1;
+
+                if(convo == null)
+                {
+                    convo = ConversationUI.CurrentConversation;
+                    if (convo == null)
+                    {
+                        QudUXLogger.Log("conversation is null");
+                        return false;
+                    }
+                }
+
+                QudUXLogger.Log($"speaker is {speaker.DisplayName}");
+                QudUXLogger.Log($"convo is {convo.ID}");
+
+                _debugSegmentCounter = 2;
 
                 //you must view a trader's goods before the new conversation options become available.
                 if (!QudUX_ConversationHelper.ZoneTradersTradedWith.Contains(speaker))
                 {
+                    QudUXLogger.Log("Returning because player didn't take a look at trader's stock");
                     return false;
                 }
-                _debugSegmentCounter = 2;
+                _debugSegmentCounter = 3;
+                
 
                 //clean up old versions of the conversation if they exist
-
-                if (convo.GetElementByID("*QudUX_RestockDiscussionNode") is Node elem && elem != null)
+                if(convo.GetStart() != null)
                 {
-                    _debugSegmentCounter = 3;
-                    convo.Elements.Remove(elem);
                     Node start = convo.GetStart();
 
-                    if (start != null)
+                    foreach (Choice choice in start.VeAisse_GetChoices())
                     {
-                        List<Choice> startChoices = start.GetChoices();
-                        _debugSegmentCounter = 4;
-
-                        for (int i = 0; i < startChoices.Count; i++)
+                        if (choice.ID == QudUX_RestockerDiscussionStartChoiceID)
                         {
-                            if (startChoices[i].ID == "*QudUX_RestockerDiscussionStartChoice")
-                            {
-                                convo.Elements.Remove(startChoices[i]);
-                            }
+                            start.Elements.Remove(choice);
                         }
                     }
                 }
-                _debugSegmentCounter = 5;
+
+                if (convo.GetElementByID(QudUX_RestockDiscussionNodeID) is Node restrockDialog && restrockDialog != null)
+                {
+                    _debugSegmentCounter = 4;
+                    convo.Elements.Remove(restrockDialog);
+                }
+
+                _debugSegmentCounter = 6;
 
                 long ticksRemaining;
                 bool bChanceBasedRestock = false;
                 if (speaker.HasPart("Restocker"))
                 {
-                    _debugSegmentCounter = 6;
+                    _debugSegmentCounter = 7;
                     Restocker r = speaker.GetPart<Restocker>();
                     ticksRemaining = r.NextRestockTick - XRLCore.CurrentTurn;
-                    _debugSegmentCounter = 7;
+                    _debugSegmentCounter = 8;
                 }
                 else if (speaker.HasPart("GenericInventoryRestocker"))
                 {
-                    _debugSegmentCounter = 8;
+                    _debugSegmentCounter = 9;
                     GenericInventoryRestocker r = speaker.GetPart<GenericInventoryRestocker>();
                     ticksRemaining = r.RestockFrequency - (XRLCore.CurrentTurn - r.LastRestockTick);
                     bChanceBasedRestock = true;
-                    _debugSegmentCounter = 9;
+                    _debugSegmentCounter = 10;
                 }
                 else
                 {
+                    QudUXLogger.Log("Returning false because speaker has no restocker part");
                     return false;
                 }
-                _debugSegmentCounter = 10;
+                _debugSegmentCounter = 11;
 
                 //build some dialog based on the time until restock and related parameters. TraderDialogGenData ensures the dialog options
                 //stay the same for a single trader during the entire time that trader is waiting for restock
                 TraderDialogGenData dialogGen = TraderDialogGenData.GetData(speaker, ticksRemaining);
-                _debugSegmentCounter = 11;
+                _debugSegmentCounter = 12;
                 double daysTillRestock = (double)ticksRemaining / Calendar.turnsPerDay;
                 string restockDialog;
                 if (daysTillRestock >= 9)
                 {
-                    _debugSegmentCounter = 12;
+                    _debugSegmentCounter = 13;
                     if (speaker.Blueprint == "Sparafucile")
                     {
                         restockDialog = "\n&w*Sparafucile pokes at a few of =pronouns.possessive= wares and then gazes up at you, squinting, as if to question the basis of your inquiry.*&y\n ";
@@ -191,13 +213,13 @@ namespace XRL.World.Parts
                 }
                 else
                 {
-                    _debugSegmentCounter = 13;
+                    _debugSegmentCounter = 14;
                     if (speaker.Blueprint == "Sparafucile")
                     {
-                        _debugSegmentCounter = 14;
+                        _debugSegmentCounter = 15;
                         if (daysTillRestock < 0.5)
                         {
-                            _debugSegmentCounter = 15;
+                            _debugSegmentCounter = 16;
                             restockDialog = "\n&w*Sparafucile nods eagerly, as if to convey that =pronouns.subjective= is expecting something very soon.*&y\n ";
                         }
                         else
@@ -209,7 +231,7 @@ namespace XRL.World.Parts
                     }
                     else
                     {
-                        _debugSegmentCounter = 16;
+                        _debugSegmentCounter = 17;
                         string daysTillRestockPhrase = (daysTillRestock < 0.5) ? "in a matter of hours"
                                     : (daysTillRestock < 1) ? "by this time tomorrow"
                                     : (daysTillRestock < 1.8) ? "within a day or two"
@@ -236,59 +258,60 @@ namespace XRL.World.Parts
                                                     + "I'll have more inventory to offer.\n\nCheck back with me " + daysTillRestockPhrase + ", and I'll show you what I've got."
                                                     + (bChanceBasedRestock ? "\n\nThat is... assuming any of the junk is actually resellable. I can't make any guarantees." : string.Empty);
                     }
-                    _debugSegmentCounter = 17;
+                    _debugSegmentCounter = 18;
                 }
 
                 //DEBUG ONLY
-                _debugSegmentCounter = 18;
+                _debugSegmentCounter = 19;
 
-                //add options to ask location of quest givers for whom the quest has already started
-                if (convo.GetElementByID("Start") != null)
+                //add options related to restock 
+                if (convo.GetStart() != null)
                 {
-                    _debugSegmentCounter = 19;
-                    //create node with info about trading
-                    string restockNodeID = "*QudUX_RestockDiscussionNode";
-
+                    //Adding new choice in conversation
                     _debugSegmentCounter = 20;
-
-                    Node n = convo.AddNode(restockNodeID, restockDialog);
-                    n.AddChoice(null, "I have more to ask", "Start");
-                    n.AddChoice(null, "Live and drink.", "End");
-
-                    _debugSegmentCounter = 21;
                     Node startNode = convo.GetStart();
                     int rand = Stat.Random(1, 3);
-                    _debugSegmentCounter = 22;
 
-                    Choice askRestockChoice = new Choice
+                    string choiceText =
+                            (rand == 1) ? "Any new wares on the way?" :
+                            (rand == 2) ? "Do you have anything else to sell?" : 
+                            "Can you let me know if you get any new stock?"
+                    ;
+
+                    Choice askRestockChoice = new Choice()
                     {
-                        ID = "*QudUX_RestockerDiscussionStartChoice",
-                        Text = (rand == 1) ? "Any new wares on the way?"
-                            : (rand == 2) ? "Do you have anything else to sell?"
-                            : "Can you let me know if you get any new stock?",
-                        Target = restockNodeID,
+                        ID = QudUX_RestockerDiscussionStartChoiceID,
+                        Text = choiceText,
+                        Target = QudUX_RestockDiscussionNodeID,
                         Parent = startNode,
-                        Ordinal = 991 //set to make this appear immediately after the trade option
+                        Ordinal = 991
+                    };
+                    
+                    startNode.Elements.Add(askRestockChoice);
+
+                    //Creating a node to display restocking info
+                    //and adding it to conversation
+                    _debugSegmentCounter = 21;
+                    Node restockDataNode = new Node()
+                    {
+                        ID = QudUX_RestockDiscussionNodeID,
+                        Text = restockDialog,
+                        Parent = convo
                     };
 
+                    restockDataNode.AddChoice(null, "I have more to ask", "Start");
+                    restockDataNode.AddChoice(null, "Live and drink.", "End");
+
+                    convo.Elements.Add(restockDataNode);
+
+                    foreach(IConversationElement e in convo.GetStart().Elements)
+                        MessageQueue.AddPlayerMessage(e.ID);
+
+                    _debugSegmentCounter = 22;
+                    startNode.Elements.Sort();
                     _debugSegmentCounter = 23;
-                    // startNode.Choices.Add(askRestockChoice);
-
-                    Choice newChoice = startNode.AddChoice(
-                        "*QudUX_RestockerDiscussionStartChoice",
-                        (rand == 1) ? "Any new wares on the way?" :
-                        (rand == 2) ? "Do you have anything else to sell?" : "Can you let me know if you get any new stock?",
-                        restockNodeID
-                    );
-
-                    newChoice.Parent = startNode;
-                    newChoice.Ordinal = 991;
-
-                    _debugSegmentCounter = 24;
-                    // startNode.Choices.Sort();
-                    _debugSegmentCounter = 25;
                 }
-                _debugSegmentCounter = 26;
+                _debugSegmentCounter = 24;
                 return true;
             }
             catch (Exception ex)
@@ -358,7 +381,7 @@ namespace XRL.World.Parts
 
         public void RemoveOldQudUXChoices(Node cNode)
         {
-            List<Choice> choices = cNode.GetChoices();
+            List<Choice> choices = cNode.VeAisse_GetChoices();
             if (cNode == null || choices == null)
             {
                 return;
