@@ -54,6 +54,8 @@ namespace XRL.UI
 			int scrollAreaHeight = 21;
 			Dictionary<string, string> optionList = GetOptionList(QudUX_AutogetHelper.AutogetSettings);
 
+			GameManager.Instance.PushGameView("QudUX:AutogetManagement");
+
 			while (true)
 			{
 				List<string> optionStrings = optionList.Keys.ToList();

@@ -12,7 +12,7 @@ All API errors have been fixed, excepted some key mapping related code that migh
 ✔ Modify character sprite<br>
 ✔ Open Autoget settings<br>
 ✔ Display Game Statistics<br>
-❌ Restocker / Merchants additional dialog <br>
+✔ Restocker / Merchants additional dialog <br>
 ❌ Hero locations addition to journal<br>
 
 Probably other things I didn't yet discovered
