@@ -4,16 +4,16 @@ This is a fork of [QudUX-2](https://github.com/egocarib/CavesOfQud-QudUX-v2?tab=
 See the readme of the [original repo](https://github.com/egocarib/CavesOfQud-QudUX-v2?tab=readme-ov-file) for informations about the mod
 
 ## Current status
+[You can check my detailed backlog here](https://docs.google.com/spreadsheets/d/16rI_opbPRsOl2Sx3e1c27gCGqyPemlzmNi4WafpfYn8/edit?usp=sharing)
+Below, a summary.
 All API errors have been fixed, excepted some key mapping related code that might require bigger refactoring. I decided to cut the whole feature to be able to test everything else.
 
 ### Non-Patch Related
-✔ Revamped UI text inventory<br>
 ✔ Quest Giver location markers<br>
 ✔ Modify character sprite<br>
 ✔ Open Autoget settings<br>
 ✔ Display Game Statistics<br>
 ✔ Restocker / Merchants additional dialog <br>
-❌ Hero locations addition to journal<br>
 
 Probably other things I didn't yet discovered
 
@@ -22,6 +22,7 @@ Probably other things I didn't yet discovered
 ✔ Patch_XRL_UI_AbilityManager<br>
 ✔ Patch_XRL_World_Parts_Mutation_MagneticPulse<br>
 ✔ Patch_XRL_Core_XRLCore<br>
+✔ Revamped UI text inventory<br>
 ✔ Patch_XRL_Core_Scores<br><br>
 
 ⚠️ Patch_XRL_UI_Look - **Works with weird quirks, not usable IMO**<br><br>
