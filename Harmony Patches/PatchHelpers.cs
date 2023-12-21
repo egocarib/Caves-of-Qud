@@ -127,12 +127,13 @@ namespace QudUX.HarmonyPatches
                 MatchedInstructions = new CodeInstruction[Instructions.Count];
             }
 
-            public bool IsMatchComplete(CodeInstruction instruction, bool showDebugInfo = false)
+            public bool IsMatchComplete(CodeInstruction instruction, bool showDebugInfo = false, int seqCount = 0)
             {
                 if (Matched)
                 {
-                    throw new Exception("PatchTargetInstructionSet invoked after match was already made [QudUX]");
+                    throw new Exception($"PatchTargetInstructionSet invoked after match was already made SEQUENCE{seqCount} [QudUX]");
                 }
+                
                 if (showDebugInfo)
                 {
                     Logger.Log("PatchTargetInstructionSet Debug:"
@@ -156,18 +157,28 @@ namespace QudUX.HarmonyPatches
 
                     if (isMatch)
                     {
+                        if(showDebugInfo)
+                        {
+                            Logger.Log($"##### INSTRUCTION[{CurrentIndex}] FOUND #####");
+                        }
                         MatchedInstructions[CurrentIndex++] = instruction;
                         CurrentGap = 0;
                     }
                     else if (++CurrentGap > Instructions[CurrentIndex].MaxGapFromPrior)
                     {
-                        CurrentIndex = 0;
+                        CurrentIndex = 0; //Resetting set. 
+                        //Should end up here when IL observed were close to the
+                        //current set, but not exactly like what was expected
                     }
                 }
                 else
                 {
                     if (InstructionsAreEqual(instruction, Instructions[CurrentIndex].Instruction))
                     {
+                        if(showDebugInfo)
+                        {
+                            Logger.Log($"##### INSTRUCTION[{CurrentIndex}] FOUND #####");
+                        }
                         MatchedInstructions[CurrentIndex++] = instruction;
                         CurrentGap = 0;
                     }
@@ -178,6 +189,10 @@ namespace QudUX.HarmonyPatches
                 }
                 if (CurrentIndex == Instructions.Count)
                 {
+                    if (showDebugInfo)
+                    {
+                        Logger.Log($"##### SEQUENCE[{seqCount}] MATCHED #####");
+                    }
                     return Matched = true;
                 }
                 return false;

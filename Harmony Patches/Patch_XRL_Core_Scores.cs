@@ -11,7 +11,6 @@ namespace QudUX.HarmonyPatches
     {
         [HarmonyTranspiler]
         [HarmonyPatch("Show")]
-        [HarmonyDebug]
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>

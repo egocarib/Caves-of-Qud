@@ -24,7 +24,8 @@ Probably other things I didn't yet discovered
 ✔ Patch_XRL_Core_XRLCore<br>
 ✔ Patch_XRL_Core_Scores<br><br>
 
+⚠️ Patch_XRL_UI_Look - **Works with weird quirks, not usable IMO**<br><br>
+
 ❌ Patch_XRL_World_GameObject_Move<br>
-❌ Patch_XRL_UI_Look<br>
 ❌ Patch_XRL_World_Parts_Campfire<br>
 ❌ Patch_XRL_World_Parts_Physics<br>

@@ -224,14 +224,23 @@ namespace QudUX.Concepts
             {
                 get { return GetMethodInfo(() => QudUX.Concepts.Events.AlwaysLoadEvent()); }
             }
-            // public static MethodInfo LookExtender_AddMarkLegendaryOptionToLooker
-            // {
-            //     get { return GetMethodInfo(() => LookExtender.AddMarkLegendaryOptionToLooker(default(ScreenBuffer), default(GameObject), default(string))); }
-            // }
-            // public static MethodInfo LookExtender_CheckKeyPress
-            // {
-            //     get { return GetMethodInfo(() => LookExtender.CheckKeyPress(default(Keys), default(GameObject), default(bool))); }
-            // }
+            public static MethodInfo LookExtender_AddMarkLegendaryOptionToLooker
+            {
+                get { return GetMethodInfo(() => LookExtender.AddMarkLegendaryOptionToLooker(default(ScreenBuffer), default(GameObject), default(string))); }
+            }
+
+            public static MethodInfo LookExtender_ReturnModifiedString
+            {
+                get { return GetMethodInfo(() => LookExtender.ReturnModifiedString(default(string), default(GameObject))); }
+            }
+            public static MethodInfo LookExtender_SetModernUIText
+            {
+                get { return GetMethodInfo(() => LookExtender.SetModerUIText(default, default)); }
+            }
+            public static MethodInfo LookExtender_CheckKeyPress
+            {
+                get { return GetMethodInfo(() => LookExtender.CheckKeyPress(default(Keys), default(GameObject), default(bool))); }
+            }
             public static MethodInfo EnhancedScoreboardExtender_ShowGameStatsScreen
             {
                 get { return GetMethodInfo(() => EnhancedScoreboardExtender.ShowGameStatsScreen()); }
