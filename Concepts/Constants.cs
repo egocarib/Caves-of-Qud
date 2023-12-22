@@ -113,11 +113,11 @@ namespace QudUX.Concepts
             }
             public static MethodInfo QudUX_IngredientSelectionScreen_Static_Show
             {
-                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<Tuple<int, GameObject, string>>), default(List<bool>))); }
+                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<ValueTuple<int, GameObject, string>>), default(List<bool>))); }
             }
             public static MethodInfo QudUX_RecipeSelectionScreen_Static_Show
             {
-                get { return GetMethodInfo(() => QudUX_RecipeSelectionScreen.Static_Show(default(List<Tuple<string, CookingRecipe>>))); }
+                get { return GetMethodInfo(() => QudUX_RecipeSelectionScreen.Static_Show(default(List<ValueTuple<string, CookingRecipe>>))); }
             }
             public static MethodInfo ScreenBuffer_Write
             {

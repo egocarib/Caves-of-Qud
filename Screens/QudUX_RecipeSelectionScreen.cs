@@ -25,10 +25,11 @@ namespace XRL.UI
 		/// <summary>
 		/// Wrapper function for Show that is called from our Harmony patch
 		/// </summary>
-		public static int Static_Show(List<Tuple<string, CookingRecipe>> recipeList)
+		public static int Static_Show(List<ValueTuple<string, CookingRecipe>> recipeList)
         {
-            Show(recipeList, out int result);
-            return result;
+			return -1;
+            // Show(recipeList, out int result);
+            // return result;
         }
 
 		/// <summary>

@@ -11,12 +11,11 @@ namespace QudUX.HarmonyPatches
 {
     /// <summary>
     /// 
-    /// Egocarib's version was only patching the Cook method but the current 
-    /// state of that method suggests that a lot of things were reworked.
-    /// I kept his work for prosperity, and patched the new methods that I
-    /// believe to be relevant:
-    /// Campfire.CookFromIngredients
-    /// Campfire.CookFromRecipe
+    /// Egocarib's version was only patching Campfire.Cook but everything has
+    /// been reworked. I kept his work for prosperity, and patched the 
+    /// new relevant methods:
+    /// • Campfire.CookFromIngredients
+    /// • Campfire.CookFromRecipe
     /// 
     /// </summary>
     [HarmonyPatch(typeof(XRL.World.Parts.Campfire))]
@@ -295,17 +294,16 @@ namespace QudUX.HarmonyPatches
 
         [HarmonyTranspiler]
         [HarmonyPatch("CookFromIngredients")]
-        [HarmonyDebug]
         static IEnumerable<CodeInstruction> Transpiler_CookFromIngredient(IEnumerable<CodeInstruction> instructions, ILGenerator gen)
         {
             //First we need to retrieve Tuple List that compiles all ingredients data
             //Then we need to retrieve the list of bool representing selected ingredients
-            //Then pass it as parameters for our IngredientSelectionScreen static show
-            //discard all insutructions drawing source menu until bool list evaluation;
+            //Then we jump over the section that is displaying vanilla selection menu
+            //and finaly we push our custom screen
 
-            // Ingredients are stored in a List<Tuple<int, GameObject, string>>, saved on index 2
-            // It is accessible through OPCode Ldloc_2, not special operand are needed so we 
-            // can directly look for the list of bool
+            // Ingredients are stored in a List<Tuple<int, GameObject, string>>, saved on index 3
+            // It is accessible through OPCode Ldloc_3, so we don't need to look for its dedicated
+            // index. We can directly look for the list of bool
             var Seq1 = new PatchTargetInstructionSet( new List<PatchTargetInstruction>(){
                 new PatchTargetInstruction(OpCodes.Ldloca_S),
                 new PatchTargetInstruction(OpCodes.Call, 0),
@@ -318,7 +316,10 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
                 new PatchTargetInstruction(OpCodes.Leave_S, 0),
             });
-
+            
+            // Seq2 is used to detect the end of the section displaying vanilla selection menu
+            // It stops exactly before the loop that will evaluate selection List
+            // Which is right were we want our menu to be displayed
             var Seq2 = new PatchTargetInstructionSet( new List<PatchTargetInstruction>()
             {
                 new PatchTargetInstruction(OpCodes.Ldloc_S),
@@ -331,9 +332,6 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
                 new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
                 new PatchTargetInstruction(OpCodes.Bgt, 0),
-                // We stop at the instruction below because it also has a Label
-                // pointing right where we want to be. i.e. at the beginning of
-                // the loop evaluating bools
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0) 
             });
 
@@ -347,17 +345,13 @@ namespace QudUX.HarmonyPatches
                 // The point of this sequence is to:
                 // • Get the instruction that pushes the list<bool> of selected ingredients
                 // • Get the instruction right before the scope display source menu to setup a jump over it
-                //
-                // Seq2 is there to detect when the source display loop ends
-                // then we can add the jump label to our instructions to complete the override
                 if(seq == 1 && Seq1.IsMatchComplete(instruction))
                 {
-                    // instructoin below is leave.s, originally jump right into source loop
-                    // We override its operand by our own label, so that it jumps were we want
-                    // instead of stepping into source loop
+                    // instruction below is leave.s, originally jumping right into vanilla display section
+                    // We override its operand with our own label, so that it jumps were we want
+                    // instead of where it's supposed to. This overrides vanilla display
                     instruction.operand = jumpOverSourceDisplay;
                     yield return instruction;
-                    //yield return new CodeInstruction(OpCodes.Br, jumpOverSourceDisplay); // Add uncondionnal jump
                     seq++;
                     continue;
                 }
@@ -365,17 +359,37 @@ namespace QudUX.HarmonyPatches
                 {
                     // We don't do anything when Seq2 is completed
                     // We just want the iterator to point at the right place
+                    // ie. where List<bool> is manipulated
                     seq++;
-                    // still keeping a ref to stop instruction Because we patch right before
+                    // still keeping a ref to stop instruction because we patch right before
                     seq2Last = instruction;
                     continue;
                 }
                 else if(seq > 2 && !_CookWithIngredientsPatched)
                 {   
-                    // When sequence 2 is completed, we insert the call of our function, before
-                    // putting back the stop instruction of Seq2, which is the beginning
-                    // of the bool loop;
-                    CodeInstruction loadIngredientList = new CodeInstruction(OpCodes.Ldloc_2);
+                    /*
+                        1.  We load the list of ingredient on the stack,
+                            and we add our label to complete the override.
+                            With this, we finalize the jump over the section
+                            displaying vanilla menu.
+                        
+                        2.  We load the list of bool representing selected
+                            ingredients on stack.
+
+                        3.  We call our custom screen method, with the last
+                            two list as parameters.
+                        
+                        4.  We push back Seq2 last instruction, to keep
+                            original logic intact.
+
+
+                        TODO ==============================================
+                        Add a check on our method return to act according
+                        to selection.
+                        ie. actually cook with selection if any, or just quit 
+                            menu (and maybe return to campfire selection popup)
+                    */
+                    CodeInstruction loadIngredientList = new CodeInstruction(OpCodes.Ldloc_3);
                     loadIngredientList.labels.Add(jumpOverSourceDisplay);
                     yield return loadIngredientList; // Push ingredient List on stack
                     yield return Seq1.MatchedInstructions[3].Clone(); // Push
@@ -395,12 +409,12 @@ namespace QudUX.HarmonyPatches
             string msg = "";
             if(!_CookWithIngredientsPatched || !_CookWithRecipePatched)
             {
-                string target = "both";
+                string failedPatch = "both";
                 if(_CookWithIngredientsPatched || _CookWithRecipePatched)
                 {
-                    target = _CookWithIngredientsPatched ? "CookWithRecipe" : "CookWithIngredients";
+                    failedPatch = _CookWithIngredientsPatched ? "CookWithRecipe" : "CookWithIngredients";
                 }
-                msg = $"Failed ({target}). This patch may not be compatible with the current game version. "
+                msg = $"Failed ({failedPatch}). This patch may not be compatible with the current game version. "
                     + "The game's default cooking UI pop-ups will be used instead of QudUX's revamped screens.";
             }
             else msg =  "Patched successfully.";
