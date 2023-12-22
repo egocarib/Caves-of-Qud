@@ -14,13 +14,12 @@ namespace QudUX.HarmonyPatches
     public class Patch_XRL_UI_Look
     {
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("ShowLooker")]
-        [HarmonyDebug]
+        
+        [HarmonyTranspiler, HarmonyPatch("ShowLooker")]
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            //First sequence changes value of text before any rendering
-            //Third sequence adds hotkey to mark legendary
+            //Seq1 modifies hotkey text right before l.114
+            //seq2 sets values of the step out loop of the screen by giving it the ret value of a custom function. right before l.377
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {   
                 new PatchTargetInstruction(OpCodes.Stloc_S), //Save stack value into text variable

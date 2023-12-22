@@ -113,7 +113,7 @@ namespace QudUX.Concepts
             }
             public static MethodInfo QudUX_IngredientSelectionScreen_Static_Show
             {
-                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<GameObject>), default(List<bool>))); }
+                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<Tuple<int, GameObject, string>>), default(List<bool>))); }
             }
             public static MethodInfo QudUX_RecipeSelectionScreen_Static_Show
             {

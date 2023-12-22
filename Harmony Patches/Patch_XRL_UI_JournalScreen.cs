@@ -14,11 +14,11 @@ namespace QudUX.HarmonyPatches
 
         [HarmonyPostfix]
         [HarmonyPatch("UpdateEntries")]
-        static void Postfix(string selectedTab, List<JournalScreen.JournalEntry> ___entries, List<string> ___displayLines, List<int> ___entryForDisplayLine)
+        static void Postfix(string selectedTab, List<JournalScreen.JournalEntry> ___entries, List<string> ___displayLines)
         {
             if (!Options.Exploration.TrackLocations)
             {
-                return; //feature is disabled
+                return; //feature is disabled   
             }
             if (selectedTab != JournalScreen.STR_LOCATIONS || ___entries.Count == 0)
             {
