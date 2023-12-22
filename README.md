@@ -11,8 +11,10 @@ See the readme of the [original repo](https://github.com/egocarib/CavesOfQud-Qud
 ✔ Quest Giver location markers<br>
 ✔ Modify character sprite<br>
 ✔ Open Autoget settings<br>
+✔ In game autoget settings<br>
 ✔ Display Game Statistics<br>
 ✔ Restocker / Merchants additional dialog <br>
+✔ Cooking with ingredients screen <br>
 
 Probably other things I didn't yet discovered
 
