@@ -313,7 +313,10 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Ldloc_S, 0), // push List<bool> on stack
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
                 new PatchTargetInstruction(OpCodes.Callvirt, 0),
-                new PatchTargetInstruction(OpCodes.Endfinally, 8)
+                new PatchTargetInstruction(OpCodes.Ldloca_S, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
+                new PatchTargetInstruction(OpCodes.Leave_S, 0),
             });
 
             var Seq2 = new PatchTargetInstructionSet( new List<PatchTargetInstruction>()
@@ -343,14 +346,18 @@ namespace QudUX.HarmonyPatches
                 // When completed, we do nothing.
                 // The point of this sequence is to:
                 // • Get the instruction that pushes the list<bool> of selected ingredients
-                // • Set the iterator before the source display loop to setup a jump over it
+                // • Get the instruction right before the scope display source menu to setup a jump over it
                 //
                 // Seq2 is there to detect when the source display loop ends
                 // then we can add the jump label to our instructions to complete the override
                 if(seq == 1 && Seq1.IsMatchComplete(instruction))
                 {
+                    // instructoin below is leave.s, originally jump right into source loop
+                    // We override its operand by our own label, so that it jumps were we want
+                    // instead of stepping into source loop
+                    instruction.operand = jumpOverSourceDisplay;
                     yield return instruction;
-                    yield return new CodeInstruction(OpCodes.Br_S, jumpOverSourceDisplay); // Add uncondionnal jump 
+                    //yield return new CodeInstruction(OpCodes.Br, jumpOverSourceDisplay); // Add uncondionnal jump
                     seq++;
                     continue;
                 }
@@ -368,12 +375,9 @@ namespace QudUX.HarmonyPatches
                     // When sequence 2 is completed, we insert the call of our function, before
                     // putting back the stop instruction of Seq2, which is the beginning
                     // of the bool loop;
-                    CodeInstruction lockPushList = new CodeInstruction(OpCodes.Ldloc_2);
-                    lockPushList.labels = new List<Label>
-                    {
-                        jumpOverSourceDisplay // Add label to jump to. This (should) completes source loop override
-                    };
-                    yield return lockPushList; // Push ingredient List on stack
+                    CodeInstruction loadIngredientList = new CodeInstruction(OpCodes.Ldloc_2);
+                    loadIngredientList.labels.Add(jumpOverSourceDisplay);
+                    yield return loadIngredientList; // Push ingredient List on stack
                     yield return Seq1.MatchedInstructions[3].Clone(); // Push
                     yield return new CodeInstruction(OpCodes.Call, QudUX_IngredientSelectionScreen_Static_Show);
                     yield return seq2Last;
