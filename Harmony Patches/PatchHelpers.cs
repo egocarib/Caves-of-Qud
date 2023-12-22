@@ -127,6 +127,12 @@ namespace QudUX.HarmonyPatches
                 MatchedInstructions = new CodeInstruction[Instructions.Count];
             }
 
+            public PatchTargetInstructionSet(params PatchTargetInstruction[] instructions)
+            {
+                Instructions = new List<PatchTargetInstruction>(instructions);
+                MatchedInstructions = new CodeInstruction[Instructions.Count];
+            }
+
             public bool IsMatchComplete(CodeInstruction instruction, bool showDebugInfo = false, int seqCount = 0)
             {
                 if (Matched)

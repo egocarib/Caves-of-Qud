@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using HarmonyLib;
 using static QudUX.HarmonyPatches.PatchHelpers;
 using static QudUX.Concepts.Constants.MethodsAndFields;
-using UnityEngine;
-using UnityEngine.SearchService;
-using Trivial.CodeSecurity;
-using System.Windows.Forms.VisualStyles;
 
 namespace QudUX.HarmonyPatches
 {
@@ -59,7 +55,7 @@ namespace QudUX.HarmonyPatches
                         // I just add labels to the first instruction I insert below
                         // Then I yield the copy of the current instruction made above last
                         // Effectively moving the labels up, at the first instruction I add
-                        yield return Sequence1.MatchedInstructions[2].Clone().MoveLabelsFrom(instruction); //push text string with labels on stack on stack
+                        yield return Sequence1.MatchedInstructions[2].Clone().MoveLabelsFrom(instruction); //push text string with labels on stack
                         yield return Sequence1.MatchedInstructions[1].Clone(); //push target 
                         yield return new CodeInstruction(OpCodes.Call, LookExtender_ReturnModifiedString); // Modify string and push on stack
                         yield return Sequence1.MatchedInstructions[0].Clone(); //save to string var;

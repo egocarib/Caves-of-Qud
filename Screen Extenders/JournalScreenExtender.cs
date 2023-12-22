@@ -70,8 +70,8 @@ namespace QudUX.ScreenExtenders
                     if (this._HasBeenVisited == null)
                     {
                         this._HasBeenVisited = this.IsValid
-                            && (XRLCore.Core.Game.ZoneManager.CachedZones.ContainsKey(this._Entry.zoneid)
-                            || JournalUtilities.FrozenZoneDataExists(this._Entry.zoneid));
+                            && (XRLCore.Core.Game.ZoneManager.CachedZones.ContainsKey(this._Entry.ZoneID)
+                            || JournalUtilities.FrozenZoneDataExists(this._Entry.ZoneID));
                     }
                     return (bool)this._HasBeenVisited;
                 }

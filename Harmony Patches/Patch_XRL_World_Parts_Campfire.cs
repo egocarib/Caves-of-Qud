@@ -5,7 +5,6 @@ using HarmonyLib;
 using QudUX.Concepts;
 using static QudUX.Concepts.Constants.MethodsAndFields;
 using static QudUX.HarmonyPatches.PatchHelpers;
-using NAudio.MediaFoundation;
 
 namespace QudUX.HarmonyPatches
 {
@@ -404,6 +403,106 @@ namespace QudUX.HarmonyPatches
             LogResult();
         }
 
+        [HarmonyTranspiler]
+        [HarmonyPatch("CookFromRecipe")]
+        [HarmonyDebug]
+        static IEnumerable<CodeInstruction> Transpiler_CookFromRecipe(IEnumerable<CodeInstruction> instructions, ILGenerator gen)
+        {   
+            /*
+                1.  Recover List<Tuple<string, recipe>>
+                2.  Jump over vanilla display
+                3.  draw custom screen
+            */
+            
+            // Used to recover recipe list
+            var Seq1 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0),
+                new PatchTargetInstruction(OpCodes.Stloc_1),
+                new PatchTargetInstruction(OpCodes.Call),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_2, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_3, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Newobj, 0),
+
+                // List<Tuple<string, recipe>> definition. Gives access to variable index
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0)
+            );
+
+            // Used to put a jump over vanilla display
+            var Seq2 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Stloc_2),
+                new PatchTargetInstruction(OpCodes.Br, 0),
+                new PatchTargetInstruction(OpCodes.Ldstr, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Ret, 0),
+
+                // Beginning of vanilla recipe display
+                // It bears a label we'll use to override
+                // vanilla display properly
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0) 
+            );
+
+            // Detects the end of vanilla display
+            // Set label to last instruction to finalize override
+            var Seq3 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Newobj),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Brfalse, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0)
+            );
+
+            int seq = 1;
+            Label jumpLabel = gen.DefineLabel();
+
+            foreach(CodeInstruction instruction in instructions)
+            {
+                if(seq == 1 && Seq1.IsMatchComplete(instruction))
+                {   
+                    seq++;
+                }
+                else
+                if(seq == 2 && Seq2.IsMatchComplete(instruction))
+                {
+                    CodeInstruction pushList = new CodeInstruction(OpCodes.Ldloc_S, Seq1.MatchedInstructions[10].operand);
+                    pushList.MoveLabelsFrom(instruction);
+
+                    yield return pushList; // push recipe list on stack with label
+                    yield return new CodeInstruction(OpCodes.Call, QudUX_RecipeSelectionScreen_Static_Show); // Add screen call
+                    yield return new CodeInstruction(OpCodes.Br, jumpLabel); // Add unconditionnal jump toward jumpLabel
+                    yield return instruction.Clone(); // Clone stopping instruction without its labels
+                    seq++;
+                    continue;
+                }
+                else
+                if(!_CookWithRecipePatched && Seq3.IsMatchComplete(instruction))
+                {
+                    yield return instruction.WithLabels(jumpLabel);
+                    _CookWithRecipePatched = true;
+                    continue;
+                }
+
+                yield return instruction;
+            }
+
+            LogResult();
+        }
+
+        // this is called twice because I don't know which patch will be done first and
+        // I don't want to give a shit
         private static void LogResult()
         {
             string msg = "";
@@ -425,10 +524,10 @@ namespace QudUX.HarmonyPatches
         [HarmonyFinalizer]
         [HarmonyPatch("CookFromIngredients")]
         static void Finalizer(System.Exception __exception)
-         {
+        {
             if(__exception != null)
             {
-                Utilities.Logger.Log("[CookFromIngredients Patch] " + __exception.Message);
+                Utilities.Logger.Log("[CookFromIngredients Patch] " + __exception.Message + "\n" + __exception.StackTrace) ;
             }
         }
 

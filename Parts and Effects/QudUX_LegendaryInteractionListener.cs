@@ -91,28 +91,28 @@ namespace XRL.World.Parts
             List<string> relationList = new List<string>();
             foreach (string key in legendaryCreature.pBrain.FactionMembership.Keys)
             {
-                Faction ifExists = Factions.getIfExists(key);
+                Faction ifExists = Factions.GetIfExists(key);
                 if (ifExists != null && ifExists.Visible)
                 {
-                    relationList.Add("Loved by {{C|" + ifExists.getFormattedName() + "}}");
+                    relationList.Add("Loved by {{C|" + ifExists.GetFormattedName() + "}}");
                 }
             }
             foreach (FriendorFoe relatedFaction in repInfo.relatedFactions)
             {
-                Faction ifExists2 = Factions.getIfExists(relatedFaction.faction);
+                Faction ifExists2 = Factions.GetIfExists(relatedFaction.faction);
                 if (ifExists2 != null && ifExists2.Visible)
                 {
                     if (relatedFaction.status == "friend")
                     {
-                        relationList.Add("Admired by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Admired by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                     else if (relatedFaction.status == "dislike")
                     {
-                        relationList.Add("Disliked by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Disliked by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                     else if (relatedFaction.status == "hate")
                     {
-                        relationList.Add("Hated by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Hated by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                 }
             }
