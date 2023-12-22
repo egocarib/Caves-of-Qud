@@ -5,8 +5,7 @@ See the readme of the [original repo](https://github.com/egocarib/CavesOfQud-Qud
 
 ## Current status
 [You can check my detailed backlog here](https://docs.google.com/spreadsheets/d/16rI_opbPRsOl2Sx3e1c27gCGqyPemlzmNi4WafpfYn8/edit?usp=sharing)
-Below, a summary.
-All API errors have been fixed, excepted some key mapping related code that might require bigger refactoring. I decided to cut the whole feature to be able to test everything else.
+<br>Below, a summary.
 
 ### Non-Patch Related
 ✔ Quest Giver location markers<br>
