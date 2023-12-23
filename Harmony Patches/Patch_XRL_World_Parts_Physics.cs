@@ -16,8 +16,8 @@ namespace QudUX.HarmonyPatches
         {
             var Sequence = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
-                new PatchTargetInstruction(OpCodes.Ldstr, "The way is blocked by "),
-                new PatchTargetInstruction(OpCodes.Call, IComponent_GameObject_AddPlayerMessage, 11)
+                new PatchTargetInstruction(OpCodes.Ldstr, "OUCH! You collide with "),
+                new PatchTargetInstruction(OpCodes.Call, IComponent_GameObject_AddPlayerMessage, 40)
             });
 
             bool patched = false;
