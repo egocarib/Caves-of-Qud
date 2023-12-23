@@ -19,7 +19,7 @@ namespace QudUX.HarmonyPatches
         {
             return QudGameObjectType.GetMethod("Move",
                 //So sorry for this
-                new Type[] 
+                new Type[]
                 {
                     typeof(string),
                     typeof(GameObject).MakeByRefType(),
@@ -63,29 +63,43 @@ namespace QudUX.HarmonyPatches
                     patched = true;
                 }
             }
-            ReportPatchStatus(patched);
+            ReportPatchStatus("First part", patched);
         }
 
         [HarmonyTranspiler]
         static IEnumerable<CodeInstruction> Transpiler_Move2(IEnumerable<CodeInstruction> instructions)
         {
+            // Look for the sequence handling movements into deep liquid
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
-                new PatchTargetInstruction(OpCodes.Callvirt, Cell_HasBridge),
-                new PatchTargetInstruction(OpCodes.Callvirt, GameObject_IsDangerousOpenLiquidVolume, 80),
-                new PatchTargetInstruction(OpCodes.Ldstr, ", dangerous-looking ", 30),
-                new PatchTargetInstruction(OpCodes.Ldloc_S, 8),
-                new PatchTargetInstruction(OpCodes.Callvirt, GameObject_get_ShortDisplayName, 0),
-                new PatchTargetInstruction(OpCodes.Stfld, XRLCore_MoveConfirmDirection, 40)
+                new PatchTargetInstruction(OpCodes.Ldloc_S), // push liquid GameObject to stack
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Stelem_Ref, 0),
+                new PatchTargetInstruction(OpCodes.Dup, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_5, 0),
+                new PatchTargetInstruction(OpCodes.Ldstr, " and start swimming.", 0),
+                new PatchTargetInstruction(OpCodes.Stelem_Ref, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Ldarg_1, 0),
+                new PatchTargetInstruction(OpCodes.Stfld, XRLCore_MoveConfirmDirection, 0)
             });
+
+            // Look for the sequence handling movement into shallow liquid
             var Sequence2 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
-                new PatchTargetInstruction(OpCodes.Callvirt, Cell_GetDangerousOpenLiquidVolume),
-                new PatchTargetInstruction(OpCodes.Ldfld, XRLCore_MoveConfirmDirection, 6),
-                new PatchTargetInstruction(OpCodes.Ldstr, "Are you sure you want to move into ", 56),
-                new PatchTargetInstruction(OpCodes.Ldloc_S, 4),
-                new PatchTargetInstruction(OpCodes.Callvirt, GameObject_get_the, 14),
-                new PatchTargetInstruction(OpCodes.Stfld, XRLCore_MoveConfirmDirection, 21)
+                new PatchTargetInstruction(OpCodes.Ldstr, " again to confirm."),
+                new PatchTargetInstruction(OpCodes.Stelem_Ref, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Ldarg_1, 0),
+                new PatchTargetInstruction(OpCodes.Stfld, XRLCore_MoveConfirmDirection, 0)
             });
 
             int seq = 1;
@@ -97,7 +111,7 @@ namespace QudUX.HarmonyPatches
                 {
                     if (Sequence1.IsMatchComplete(instruction))
                     {
-                        yield return new CodeInstruction(OpCodes.Ldloc_S, Sequence1.MatchedInstructions[3].operand);
+                        yield return Sequence1.MatchedInstructions[0].Clone();
                         yield return new CodeInstruction(OpCodes.Ldc_I4_1);
                         yield return new CodeInstruction(OpCodes.Call, ParticleTextMaker_EmitFromPlayerIfLiquid);
                         seq++;
@@ -105,26 +119,32 @@ namespace QudUX.HarmonyPatches
                 }
                 else if (!patched && Sequence2.IsMatchComplete(instruction))
                 {
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, Sequence2.MatchedInstructions[3].operand);
+                    yield return Sequence1.MatchedInstructions[0].Clone();
                     yield return new CodeInstruction(OpCodes.Ldc_I4_0);
                     yield return new CodeInstruction(OpCodes.Call, ParticleTextMaker_EmitFromPlayerIfLiquid);
                     patched = true;
                 }
             }
-            ReportPatchStatus(patched);
+
+            ReportPatchStatus("second part", patched);
         }
 
-        private static readonly List<bool> PatchStatuses = new List<bool>();
-        private static void ReportPatchStatus(bool success)
+        private static readonly Dictionary<string, bool> PatchStatuses = new Dictionary<string, bool>();
+        private static void ReportPatchStatus(string patchname, bool success)
         {
-            PatchStatuses.Add(success);
+            PatchStatuses.Add(patchname, success);
             if (PatchStatuses.Count >= 2)
             {
-                int failCount = PatchStatuses.Where(s => s == false).Count();
+                int failCount = PatchStatuses.Where(s => !s.Value).Count();
                 if (failCount > 0)
                 {
+                    string msg = "both";
+                    if (failCount < 2)
+                    {
+                        msg = PatchStatuses.Where(s => !s.Value).ToArray()[0].Key;
+                    }
                     PatchHelpers.LogPatchResult("GameObject.Move",
-                        $"Failed ({failCount}/2). This patch may not be compatible with the current game version. "
+                        $"Failed ({msg}). This patch may not be compatible with the current game version. "
                         + "Some particle text effects may not be shown when movement is prevented.");
                 }
                 else

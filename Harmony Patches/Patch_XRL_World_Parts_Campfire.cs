@@ -314,7 +314,7 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Ldloca_S, 0),
                 new PatchTargetInstruction(OpCodes.Call, 0),
                 new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
-                new PatchTargetInstruction(OpCodes.Leave_S, 0),
+                new PatchTargetInstruction(OpCodes.Leave_S, 0)
             });
             
             // Seq2 is used to detect the end of the section displaying vanilla selection menu
@@ -406,12 +406,11 @@ namespace QudUX.HarmonyPatches
                 yield return instruction;
             }
 
-            LogResult("Cook_Ingredients", patched);
+            ReportPatchStatus("CookFromIngredients", patched);
         }
 
         [HarmonyTranspiler]
         [HarmonyPatch("CookFromRecipe")]
-        [HarmonyDebug]
         static IEnumerable<CodeInstruction> Transpiler_CookFromRecipe(IEnumerable<CodeInstruction> instructions, ILGenerator gen)
         {   
             /*
@@ -524,22 +523,34 @@ namespace QudUX.HarmonyPatches
                 yield return instruction;
             }
 
-            LogResult("Cook_Recipe", patched);
+            ReportPatchStatus("CookFromRecipe", patched);
         }
 
-        // this is called twice because I don't know which patch will be done first and
-        // I don't want to give a shit
-        private static void LogResult(string patchName, bool patched)
+        private static readonly Dictionary<string, bool> PatchStatuses = new Dictionary<string, bool>();
+        private static void ReportPatchStatus(string patchname, bool success)
         {
-            string msg;
-            if(patched) msg = "Patched successfully";
-            else
+            PatchStatuses.Add(patchname, success);
+            if (PatchStatuses.Count >= 2)
             {
-                msg = $"Failed. This patch may not be compatible with the current game version. "
-                    + "The game's default cooking UI pop-ups will be used instead of QudUX's revamped screens.";
+                int failCount = PatchStatuses.Where(s => !s.Value).Count();
+                if (failCount > 0)
+                {
+                    string msg = "both";
+                    if(failCount < 2)
+                    {
+                        msg = PatchStatuses.Where(s => !s.Value).ToArray()[0].Key;
+                    }
+                    PatchHelpers.LogPatchResult("GameObject.Move",
+                        $"Failed ({msg}). This patch may not be compatible with the current game version. "
+                        + "Some particle text effects may not be shown when movement is prevented.");
+                }
+                else
+                {
+                    PatchHelpers.LogPatchResult("GameObject.Move",
+                        "Patched successfully." /* Adds option to show particle text messages when movement is prevented for various reasons. */ );
+                }
+                PatchStatuses.Clear();
             }
-
-            PatchHelpers.LogPatchResult(patchName, msg);
         }
 
         [HarmonyFinalizer]
