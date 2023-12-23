@@ -57,7 +57,6 @@ namespace XRL.World.Parts
 
         public static void BatchMarkLegendary()
         {
-            AddPlayerMessage("Batch mark legendary");
             List<PointOfInterest> legendaryCreatures = GetPointsOfInterestEvent.GetFor(The.Player)
             .Where(
                 point =>
