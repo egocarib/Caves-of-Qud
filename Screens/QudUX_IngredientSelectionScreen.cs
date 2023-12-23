@@ -30,9 +30,9 @@ namespace XRL.UI
 			Show(ingredients, isIngredientSelected);
 			if (isIngredientSelected.Where(i => i == true).Count() > 0)
             {
-				return 0; //ingredients were selected
+				return 1; //ingredients were selected
             }
-			return -1; //no ingredients selected, request interface exit.
+			return 0; //no ingredients selected, request interface exit.
 		}
 
 		/// <summary>

@@ -7,6 +7,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Skills.Cooking;
 using QudUX.Utilities;
+using XRL.Messages;
 
 namespace XRL.UI
 {
@@ -25,11 +26,10 @@ namespace XRL.UI
 		/// <summary>
 		/// Wrapper function for Show that is called from our Harmony patch
 		/// </summary>
-		public static int Static_Show(List<ValueTuple<string, CookingRecipe>> recipeList)
+		public static int Static_Show(List<Tuple<string, CookingRecipe>> recipeList)
         {
-			return -1;
-            // Show(recipeList, out int result);
-            // return result;
+           Show(recipeList, out int result);
+           return result;
         }
 
 		/// <summary>
@@ -287,7 +287,7 @@ namespace XRL.UI
 			//Screen exit
 			Console.DrawBuffer(cachedScrapBuffer);
 			GameManager.Instance.PopGameView(true);
-			return ScreenReturn.Exit;
+			return ScreenReturn.Next;
 		}
 	}
 
