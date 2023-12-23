@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Qud.API;
 using XRL.UI;
@@ -52,6 +53,42 @@ namespace XRL.World.Parts
             JournalAPI.AddMapNote(target.CurrentZone.ZoneID, entryText, "Legendary Creatures", secretId: secret, revealed: true, sold: true, silent: true);
             string text = "You note the location of " + target.DisplayNameOnlyDirect + "&y in the &W" + JournalScreen.STR_LOCATIONS + " > Legendary Creatures &ysection of your journal.";
             Popup.Show(text);
+        }
+
+        public static void BatchMarkLegendary()
+        {
+            List<PointOfInterest> legendaryCreatures = GetPointsOfInterestEvent.GetFor(The.Player)
+            .Where(
+                point =>
+                point.Object.HasProperty("Hero") || point.Object.Property["Role"] == "Hero"
+            ).ToList();
+
+            if(legendaryCreatures.Count == 0)
+            {
+                Popup.Show("You haven't noticed any legendary creature here.");
+                return;
+            }
+
+            if(legendaryCreatures.Count == 1)
+            {
+                MarkLegendaryLocation(legendaryCreatures[0].Object);
+                return;
+            }
+
+            string names = "";
+
+            GameObject target;
+            for(int i=0; i<legendaryCreatures.Count; i++)
+            {
+                target = legendaryCreatures[i].Object;
+                string entryText = $"{target.DisplayNameOnlyDirect}{ParentheticalListOfRelations(target)}";
+                string secret = MakeSecretId(target);
+                JournalAPI.AddMapNote(target.CurrentZone.ZoneID, entryText, "Legendary Creatures", secretId: secret, revealed: true, sold: true, silent: true);
+
+                names += target.ShortDisplayName + (i < target.Count - 1 ? "\n" : "");
+            }
+
+            Popup.Show("You note the location of the following creatures in your journal: \n\n" + names);
         }
 
         public static void UnmarkLegendaryLocation(GameObject target)

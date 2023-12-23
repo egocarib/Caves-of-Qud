@@ -5,15 +5,16 @@ namespace XRL.World.Parts
     [Serializable]
     public class QudUX_CommandListener : IPart
     {
+        public static readonly string CmdBatchAddLegendaryEntry = "QudUX_BatchAddLegendaryEntry";
         public static readonly string CmdOpenSpriteMenu = "QudUX_OpenSpriteMenu";
         public static readonly string CmdOpenAutogetMenu = "QudUX_OpenAutogetMenu";
-        public static readonly string cmdOpenGameStatsMenu = "QudUX_OpenGameStatsMenu";
+        public static readonly string CmdOpenGameStatsMenu = "QudUX_OpenGameStatsMenu";
 
         public override void Register(GameObject Object)
         {
             Object.RegisterPartEvent(this, CmdOpenSpriteMenu);
             Object.RegisterPartEvent(this, CmdOpenAutogetMenu);
-            Object.RegisterPartEvent(this, cmdOpenGameStatsMenu);
+            Object.RegisterPartEvent(this, CmdOpenGameStatsMenu);
             
             base.Register(Object);
         }
@@ -33,9 +34,13 @@ namespace XRL.World.Parts
             {
                 QudUX.Wishes.AutopickupMenu.Wish();
             }
-            if (E.ID == cmdOpenGameStatsMenu)
+            if (E.ID == CmdOpenGameStatsMenu)
             {
                 QudUX.Wishes.GameStatsMenu.Wish();
+            }
+            if (E.ID == CmdBatchAddLegendaryEntry)
+            {
+                QudUX_LegendaryInteractionListener.BatchMarkLegendary();
             }
             return base.FireEvent(E);
         }
