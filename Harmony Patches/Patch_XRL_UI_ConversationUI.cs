@@ -1,16 +1,17 @@
-﻿//using System;
-//using System.Reflection;
-//using System.Reflection.Emit;
-//using System.Collections.Generic;
-//using HarmonyLib;
-//using XRL.Core;
-//using QudUX.Utilities;
-//using static QudUX.Concepts.Constants.MethodsAndFields;
-//using static QudUX.HarmonyPatches.PatchHelpers;
+﻿// using System;
+// using System.Reflection;
+// using System.Reflection.Emit;
+// using System.Collections.Generic;
+// using HarmonyLib;
+// using XRL.Core;
+// using QudUX.Utilities;
+// using static QudUX.Concepts.Constants.MethodsAndFields;
+// using static QudUX.HarmonyPatches.PatchHelpers;
+// using XRL.UI;
 
-//namespace QudUX.HarmonyPatches
-//{
-//    [HarmonyPatch]
+// namespace QudUX.HarmonyPatches
+// {
+//    [HarmonyPatch(typeof(ConversationUI))]
 //    class Patch_XRL_UI_ConversationUI
 //    {
 //        //This is a more stable method of specifying the target method than using an attribute, because
@@ -23,18 +24,14 @@
 //            List<MethodInfo> methodsFromCoversationUI = AccessTools.GetDeclaredMethods(typeof(XRL.UI.ConversationUI));
 //            foreach (MethodInfo method in methodsFromCoversationUI)
 //            {
-//                //if (method.Name == "HaveConversation")
-//                //{
-//                //    ret = method;
-//                //    Type[] argumentTypes = method.GetGenericArguments();
-//                //    if (argumentTypes.Length > 0 && argumentTypes[0] == typeof(XRL.World.Conversation))
-//                //    {
-//                //        return method;
-//                //    }
-//                //}
-//                if (method.Name == "_HaveConversation")
+//                if (method.Name == "HaveConversation")
 //                {
-//                    return method;
+//                   ret = method;
+//                   Type[] argumentTypes = method.GetGenericArguments();
+//                   if (argumentTypes.Length > 0 && argumentTypes[0] == typeof(XRL.World.Conversations.Conversation))
+//                   {
+//                       return method;
+//                   }
 //                }
 //            }
 //            return ret;
@@ -93,4 +90,4 @@
 //            }
 //        }
 //    }
-//}
+// }

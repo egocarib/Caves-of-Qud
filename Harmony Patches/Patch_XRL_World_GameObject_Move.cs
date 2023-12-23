@@ -13,35 +13,24 @@ namespace QudUX.HarmonyPatches
     [HarmonyPatch]
     class Patch_XRL_World_GameObject_Move
     {
-        static Type QudGameObjectType = AccessTools.TypeByName("XRL.World.GameObject");
-
         static MethodInfo TargetMethod()
         {
-            return QudGameObjectType.GetMethod("Move",
-                //So sorry for this
-                new Type[]
+            List<MethodInfo> gameObjectMethod = AccessTools.GetDeclaredMethods(typeof(XRL.World.GameObject));
+            foreach(MethodInfo method in gameObjectMethod)
+            {
+                if(method.Name == "Move")
                 {
-                    typeof(string),
-                    typeof(GameObject).MakeByRefType(),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(GameObject),
-                    typeof(GameObject),
-                    typeof(bool),
-                    typeof(int?),
-                    typeof(string),
-                    typeof(int?),
-                    typeof(bool),
-                    typeof(bool),
-                    typeof(GameObject),
-                    typeof(GameObject),
+                    Type[] arguments = method.GetGenericArguments();
+                    if(arguments.Length > 2 && arguments[0] == typeof(string) && arguments[1] == typeof(GameObject).MakeByRefType())
+                    {
+                        return method;
+                    }
                 }
-            );
+            }
+            
+            return null;
         }
+
 
         [HarmonyTranspiler]
         static IEnumerable<CodeInstruction> Transpiler_Move1(IEnumerable<CodeInstruction> instructions)

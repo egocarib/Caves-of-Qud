@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <commands>
+  <command ID="QudUX_BatchAddLegendaryEntry" DisplayText="Add a journal entry for every legendary creature discovered in the current zone" Category="QudUX" Layer="Adventure" Auto="Down"></command>
   <command ID="QudUX_OpenSpriteMenu" DisplayText="Modify Character Sprite" Category="QudUX" Layer="Adventure" Auto="Down"></command>
   <command ID="QudUX_OpenAutogetMenu" DisplayText="Open Autoget Settings" Category="QudUX" Layer="Adventure" Auto="Down"></command>
   <command ID="QudUX_OpenGameStatsMenu" DisplayText="Display Games Statistics" Category="QudUX" Layer="Adventure" Auto="Down"></command>

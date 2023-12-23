@@ -15,6 +15,7 @@ namespace XRL.World.Parts
             Object.RegisterPartEvent(this, CmdOpenSpriteMenu);
             Object.RegisterPartEvent(this, CmdOpenAutogetMenu);
             Object.RegisterPartEvent(this, CmdOpenGameStatsMenu);
+            Object.RegisterPartEvent(this, CmdBatchAddLegendaryEntry);
             
             base.Register(Object);
         }
@@ -40,6 +41,7 @@ namespace XRL.World.Parts
             }
             if (E.ID == CmdBatchAddLegendaryEntry)
             {
+                AddPlayerMessage("Batch Add command received");
                 QudUX_LegendaryInteractionListener.BatchMarkLegendary();
             }
             return base.FireEvent(E);

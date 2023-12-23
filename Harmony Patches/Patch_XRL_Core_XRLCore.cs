@@ -55,7 +55,7 @@ namespace QudUX.HarmonyPatches
 
         [HarmonyPostfix]
         [HarmonyPatch("bootGame")]
-        public static void PostFix()
+        public static void BootGamePostFix()
         {
             Concepts.Events.EmbarkEvent();
             Concepts.Events.AlwaysLoadEvent("boot game");

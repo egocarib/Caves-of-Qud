@@ -19,11 +19,7 @@ See the readme of the [original repo](https://github.com/egocarib/CavesOfQud-Qud
 ### Other
 ✔ Quest Giver location markers<br>
 ✔ Restocker / Merchants additional dialog <br><br>
-
-⚠️ Look features only "work" when used with lock on.
-
-❌ Patch_XRL_World_GameObject_Move<br>
-
+✔ Mark legendary to journal + auto marking hotkey
 
 
 ### Patches
@@ -36,15 +32,14 @@ This is just somewhat of a backlog. You'll see right there what I still have to 
 ✔ Revamped UI text inventory<br>
 ✔ Patch_XRL_Core_Scores<br><br>
 ✔ Patch_XRL_World_Parts_Campfire<br>
+✔ Patch_XRL_World_GameObject_Move<br>
+✔ Patch_XRL_World_Parts_Physics<br>
+✔ Patch_XRL_UI_Look<br><br>
 
-⚠️ Patch_XRL_UI_Look - **Works with weird quirks, not usable IMO**<br><br>
 
-❌ Patch_XRL_World_GameObject_Move<br>
-❌ Patch_XRL_World_Parts_Physics<br>
+### Unnecessary
+Those scripts are not necessary since it appears their features is covered elsewhere, either by vanilla or by other parts of the mod.
 
-Those scripts were fully commented, so I just decided to put them on hold until I've reworked everything else
-
-🛑 Patch_XRL_UI_ConversationUI<br>
-🛑 Patch_XRL_UI_CreateCharacter<br>
-🛑 Patch_XRL_World_Parts_Description<br>
-🛑 QudUX_IngredientSelectionScreen<br>
+🗑️ Patch_XRL_UI_ConversationUI<br>
+🗑️ Patch_XRL_UI_CreateCharacter<br>
+🗑️ Patch_XRL_World_Parts_Description<br>

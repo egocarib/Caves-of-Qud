@@ -35,6 +35,8 @@ namespace QudUX.ScreenExtenders
 
         public static string ReturnModifiedString(string uiHotkeyString, GameObject target)
         {
+            if(target == null) return uiHotkeyString;
+            
             if ((target.HasProperty("Hero") || target.GetStringProperty("Role") == "Hero") && target.HasPart(typeof(GivesRep)))
             {
                 LegacyKeyCode buttonA = ControlManager.mapCommandToPrimaryLegacyKeycode("CmdWalk");

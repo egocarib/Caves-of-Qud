@@ -57,10 +57,11 @@ namespace XRL.World.Parts
 
         public static void BatchMarkLegendary()
         {
+            AddPlayerMessage("Batch mark legendary");
             List<PointOfInterest> legendaryCreatures = GetPointsOfInterestEvent.GetFor(The.Player)
             .Where(
                 point =>
-                point.Object.HasProperty("Hero") || point.Object.Property["Role"] == "Hero"
+                point.Object.HasProperty("Hero") || point.Object.GetStringProperty("Role") == "Hero" && point.Object.HasPart(typeof(GivesRep))
             ).ToList();
 
             if(legendaryCreatures.Count == 0)
