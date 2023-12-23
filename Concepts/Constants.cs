@@ -14,6 +14,7 @@ using QudUX.Utilities;
 using static HarmonyLib.SymbolExtensions;
 using static HarmonyLib.AccessTools;
 using System.IO;
+using QudUX.HarmonyPatches;
 
 namespace QudUX.Concepts
 {
@@ -117,7 +118,7 @@ namespace QudUX.Concepts
             }
             public static MethodInfo QudUX_RecipeSelectionScreen_Static_Show
             {
-                get { return GetMethodInfo(() => QudUX_RecipeSelectionScreen.Static_Show(default(List<ValueTuple<string, CookingRecipe>>))); }
+                get { return GetMethodInfo(() => QudUX_RecipeSelectionScreen.Static_Show(default(List<Tuple<string, CookingRecipe>>))); }
             }
             public static MethodInfo ScreenBuffer_Write
             {
@@ -228,14 +229,17 @@ namespace QudUX.Concepts
             {
                 get { return GetMethodInfo(() => LookExtender.AddMarkLegendaryOptionToLooker(default(ScreenBuffer), default(GameObject), default(string))); }
             }
-
+            public static MethodInfo Debug_string
+            {
+                get { return GetMethodInfo(() => PatchHelpers.AddPlayerMessage(default(string))); }
+            }
+            public static MethodInfo Debug_LogInt
+            {
+                get { return GetMethodInfo(() => PatchHelpers.AddPlayerMessage(default(int))); }
+            }
             public static MethodInfo LookExtender_ReturnModifiedString
             {
                 get { return GetMethodInfo(() => LookExtender.ReturnModifiedString(default(string), default(GameObject))); }
-            }
-            public static MethodInfo LookExtender_SetModernUIText
-            {
-                get { return GetMethodInfo(() => LookExtender.SetModerUIText(default, default)); }
             }
             public static MethodInfo LookExtender_CheckKeyPress
             {

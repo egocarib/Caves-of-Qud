@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Collections.Generic;
 using HarmonyLib;
+using UnityEngine.XR;
 
 namespace QudUX.HarmonyPatches
 {
@@ -24,6 +25,11 @@ namespace QudUX.HarmonyPatches
                 return i1.opcode == i2.opcode && i1.operand == i2.operand;
             }
             return i1.Is(i2.opcode, i2.operand); //recommended comparison method (https://bit.ly/2R7GkeA), but can't handle null
+        }
+        
+        public static void AddPlayerMessage<T>(T obj)
+        {
+            XRL.Messages.MessageQueue.AddPlayerMessage(obj.ToString(), 'R');
         }
 
         public static bool IsLoadLocalInstruction(CodeInstruction i)
