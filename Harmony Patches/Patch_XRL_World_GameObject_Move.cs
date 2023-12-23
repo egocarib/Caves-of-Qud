@@ -20,8 +20,9 @@ namespace QudUX.HarmonyPatches
             {
                 if(method.Name == "Move")
                 {
-                    Type[] arguments = method.GetGenericArguments();
-                    if(arguments.Length > 2 && arguments[0] == typeof(string) && arguments[1] == typeof(GameObject).MakeByRefType())
+                    ParameterInfo[] arguments = method.GetParameters();
+
+                    if(arguments.Length > 2 && arguments[0].ParameterType == typeof(string) && arguments[1].ParameterType == typeof(GameObject).MakeByRefType())
                     {
                         return method;
                     }

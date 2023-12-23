@@ -587,6 +587,7 @@ namespace XRL.UI
                 IEvent SentEvent = null;
 
                 keys = ConsoleLib.Console.Keyboard.getvk(Options.MapDirectionsToKeypad, true);
+
                 string ts = "";
                 char ch = (ts + (char) Keyboard.Char + " ").ToLower()[0];
                 if (keys == Keys.Enter)
@@ -625,7 +626,7 @@ namespace XRL.UI
                     }
                 }
                 else
-                if ((int)keys == 131142 || ch == ',') // ctrl+f
+                if ((int)keys == 131142 || (int)keys == 252 || ch == ',') // ctrl+f couldn't get in there with default value 131142. 252 works tho
                 {
                     FilterString = Popup.AskString("Enter text to filter inventory by item name.", FilterString, 80, 0);
                     ClearLists();
