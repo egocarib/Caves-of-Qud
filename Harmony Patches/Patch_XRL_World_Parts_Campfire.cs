@@ -568,10 +568,10 @@ namespace QudUX.HarmonyPatches
 
     /// <summary>
     /// I don't really know why, but without this patch, modifications
-    /// made to the Cook with recipe methods has chances to just crash
+    /// made to the Cook with recipe methods have chances to just crash
     /// at the very end, because it calls Campfire.ForceTastyBasedOnIngredients
-    /// with a list without initializing it ? I don't know why vanilla isn't 
-    /// crashing.
+    /// with a list without initializing it ? I don't know why vanilla
+    /// isn't crashing.
     /// </summary>
     [HarmonyPatch(typeof(XRL.World.Parts.Campfire))]
     public class Patch_XRL_World_Parts_Campfire_ForceTastyBasedOnIngredients

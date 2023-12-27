@@ -148,7 +148,7 @@ namespace XRL.World.Parts
                 {
                     Node start = convo.GetStart();
 
-                    foreach (Choice choice in start.VeAisse_GetChoices())
+                    foreach (Choice choice in start.QudUX_GetChoices())
                     {
                         if (choice.ID == QudUX_RestockerDiscussionStartChoiceID)
                         {
@@ -304,9 +304,6 @@ namespace XRL.World.Parts
 
                     convo.Elements.Add(restockDataNode);
 
-                    foreach(IConversationElement e in convo.GetStart().Elements)
-                        MessageQueue.AddPlayerMessage(e.ID);
-
                     _debugSegmentCounter = 22;
                     startNode.Elements.Sort();
                     _debugSegmentCounter = 23;
@@ -381,7 +378,7 @@ namespace XRL.World.Parts
 
         public void RemoveOldQudUXChoices(Node cNode)
         {
-            List<Choice> choices = cNode.VeAisse_GetChoices();
+            List<Choice> choices = cNode.QudUX_GetChoices();
             if (cNode == null || choices == null)
             {
                 return;

@@ -30,7 +30,7 @@ namespace QudUX.HarmonyPatches
 
         /// <summary>
         /// 
-        /// Calculate target method. QudHistoryFactory is not longer internal, but
+        /// Calculate target method. QudHistoryFactory is no longer internal, but
         /// method signature contains out parameters, which require MakeByRefType()
         /// to be used, and it cannot be called within HarmonyTargetMethod attribute
         /// 
@@ -116,7 +116,7 @@ namespace QudUX.HarmonyPatches
                             {
                                 TranspilePatchApplied = true;
                                 PatchHelpers.LogPatchResult("QudHistoryFactory",
-                                    "Patched successfully." /* Removes \"some forgotten ruins\" as a naming option and ensures all ruins have unique names. */ );
+                                 "Patched successfully." /* Removes \"some forgotten ruins\" as a naming option and ensures all ruins have unique names. */ );
                                 //We have found our target triplet of IL instructions
                                 ins[i + 1].operand = 59; //make the modification
                                 return ins.AsEnumerable(); //return the modified instructions
