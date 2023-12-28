@@ -248,16 +248,16 @@ namespace XRL.UI
                         return ScreenReturn.Exit;
                     }
                 }
-                if (keys == Keys.Add || keys == Keys.Oemplus)
+                if (keys == Keys.Add || keys == Keys.Oemplus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Positive"))
                 {
-                    if ((screenMode == ScreenMode.CoreTiles && !moreOptionSelected) || screenMode == ScreenMode.ExtendedTiles)
+                    if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
                         currentTiler.RotateDetailColor(1);
                     }
                 }
-                if (keys == Keys.Subtract || keys == Keys.OemMinus)
+                if (keys == Keys.Subtract || keys == Keys.OemMinus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Negative"))
                 {
-                    if ((screenMode == ScreenMode.CoreTiles && !moreOptionSelected) || screenMode == ScreenMode.ExtendedTiles)
+                    if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
                         currentTiler.RotateDetailColor(-1);
                     }
