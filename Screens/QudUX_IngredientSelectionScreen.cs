@@ -146,7 +146,6 @@ namespace XRL.UI
 			List<IngredientScreenInfo> ingredientInfo = new List<IngredientScreenInfo>();
 			GetShortDescriptionEvent descriptionEvent = new GetShortDescriptionEvent();
 			int index = 0;
-			MessageQueue.AddPlayerMessage("ingredients count:" + ingredients.Count, 'W');
 
 			foreach (ValueTuple<int, GameObject, string> valueTuple in ingredients)
 			{
