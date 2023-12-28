@@ -358,6 +358,9 @@ namespace XRL.UI
 
                 optionMsg += " "+ DeleteEndPeriod(Options.OptionsByID["Option@AlwaysHPColor"].DisplayText) + " option";
             }
+
+            if(string.IsNullOrEmpty(optionMsg))
+                return;
             
                 
             Popup.Show("Note: You have the {{C|" + optionMsg + "}} turned on, so "
