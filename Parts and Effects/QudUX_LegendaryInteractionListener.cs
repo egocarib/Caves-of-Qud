@@ -85,10 +85,9 @@ namespace XRL.World.Parts
                 string secret = MakeSecretId(target);
                 JournalAPI.AddMapNote(target.CurrentZone.ZoneID, entryText, "Legendary Creatures", secretId: secret, revealed: true, sold: true, silent: true);
 
-                names += target.ShortDisplayName + (i < target.Count - 1 ? "\n" : "");
+                names += target.ShortDisplayName + (i == legendaryCreatures.Count - 1 ? "" : "\n");
             }
-
-            Popup.Show("You note the location of the following creatures in your journal: \n\n" + names);
+            Popup.Show("{{W|You note the location of the following creatures in your journal:}}\n" + names);
         }
 
         public static void UnmarkLegendaryLocation(GameObject target)

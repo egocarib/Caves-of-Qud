@@ -41,7 +41,6 @@ namespace XRL.World.Parts
             }
             if (E.ID == CmdBatchAddLegendaryEntry)
             {
-                AddPlayerMessage("Batch Add command received");
                 QudUX_LegendaryInteractionListener.BatchMarkLegendary();
             }
             return base.FireEvent(E);
