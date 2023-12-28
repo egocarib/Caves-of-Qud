@@ -7,7 +7,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Skills.Cooking;
 using QudUX.Utilities;
-using XRL.Messages;
+using Qud.API;
 
 namespace XRL.UI
 {
@@ -172,6 +172,10 @@ namespace XRL.UI
 				//Respond to keyboard input
 				keys = Keyboard.getvk(Options.MapDirectionsToKeypad);
 
+				if(keys == Keys.MouseEvent)
+					QudUX.Utilities.Logger.Log(keys.ToString()+":"+Keyboard.CurrentMouseEvent.Event);
+
+
 				if (keys == Keys.Escape || keys == Keys.NumPad5)
 				{
 					screenResult = -1; //canceled
@@ -244,18 +248,26 @@ namespace XRL.UI
 						}
 					}
 				}
-				if (keys == Keys.D || keys == Keys.Delete)
+				if (keys == Keys.D || keys == Keys.Delete || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:CmdDelete"))
 				{
 					if (Popup.ShowYesNo("{{y|Are you sure you want to forget your recipe for }}" + selectedRecipe.GetDisplayName() + "{{y|?}}") == DialogResult.Yes)
 					{
 						selectedRecipe.Hidden = true;
 						for (int i = 0; i < recipeList.Count; i++)
                         {
-							if (recipeList[i].Item2 == selectedRecipe)
+							CookingRecipe current = recipeList[i].Item2;
+							if (current == selectedRecipe)
                             {
+								current.Hidden = true;
 								recipeList.RemoveAt(i);
 								break;
                             }
+						}
+
+						if(recipeList.Count == 0)
+						{
+							Popup.Show("You forgot the only recipe you knew...");
+							break;
 						}
 						selectedRecipeIndex = Math.Min(selectedRecipeIndex, recipeList.Count - 1);
 						scrollOffset = Math.Min(scrollOffset, recipeList.Count - 1);
