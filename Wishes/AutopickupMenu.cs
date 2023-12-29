@@ -11,7 +11,6 @@ namespace QudUX.Wishes
         [WishCommand(Regex = @"(?:[Qq]ud[Uu][Xx] ?)?[Aa]uto-?[Pp]ickup ?[Mm]enu")]
         public static void Wish(Match match = null)
         {
-            Utilities.Logger.Log("Wish invoked: Open Auto-pickup Menu");
             if (!Concepts.Options.UI.EnableAutogetExclusions)
             {
                 Popup.Show("You've disabled the option to {{C|Use item interaction menu to disable auto-pickup for specific items}}."
