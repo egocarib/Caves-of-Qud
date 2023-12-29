@@ -37,7 +37,7 @@ namespace XRL.World.Parts
             }
             return AutogetSettings.GetValue($"ShouldAutoget:{thing.Blueprint}", "").EqualsNoCase("No");
         }
-        
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade) || ID == OwnerGetInventoryActionsEvent.ID || ID == InventoryActionEvent.ID;
@@ -64,15 +64,13 @@ namespace XRL.World.Parts
             }
             if (isAutogetItem && E.Object.Understood())
             {
-                int charInt = 'a' + E.Actions.Count + 1;
-                char key = charInt > 122 ? ' ' : (char)charInt;
                 if (IsAutogetDisabledByQudUX(E.Object))
                 {
-                    E.AddAction("Re-enable auto-pickup for this item", "re-enable auto-pickup", CmdEnableAutoget, Key: key, FireOnActor: true);
+                    E.AddAction("Re-enable auto-pickup for this item", "re-enable auto-pickup", CmdEnableAutoget,FireOnActor: true);
                 }
                 else
                 {
-                    E.AddAction("Disable auto-pickup for this item", "disable auto-pickup", CmdDisableAutoget, Key: key, FireOnActor: true);
+                    E.AddAction("Disable auto-pickup for this item", "disable auto-pickup", CmdDisableAutoget, FireOnActor: true);
                 }
             }
             return base.HandleEvent(E);
