@@ -588,6 +588,11 @@ namespace XRL.UI
 
                 keys = ConsoleLib.Console.Keyboard.getvk(Options.MapDirectionsToKeypad, true);
 
+                if(keys == Keys.MouseEvent)
+                    QudUX.Utilities.Logger.Log("MouseEvent: " +Keyboard.CurrentMouseEvent.Event);
+                else
+                    QudUX.Utilities.Logger.Log(keys.ToString());
+
                 string ts = "";
                 char ch = (ts + (char) Keyboard.Char + " ").ToLower()[0];
                 if (keys == Keys.Enter)
@@ -595,7 +600,7 @@ namespace XRL.UI
                     keys = Keys.Space;
                 }
 
-                if (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "RightClick")
+                if (keys.IsMouseEvent("RightClick"))
                 {
                     bDone = true;
                 }
@@ -604,7 +609,7 @@ namespace XRL.UI
                     InventoryScreenExtender.HelpText.Show();
                 }
                 else
-                if ((int) keys == 131137) // ctrl+a
+                if (keys.IsControl(Keys.A)) // ctrl+a
                 {
                     if (CurrentObject != null)
                     {
@@ -614,31 +619,29 @@ namespace XRL.UI
                     }
                 }
                 else
-                if ((int)keys == 131140) // ctrl+d
+                if (keys.IsControl(Keys.D)) // ctrl+d
                 {
                     if (CurrentObject != null)
                     {
-                        Event E = Event.New("CommandDropObject", "Object", CurrentObject);
-                        SentEvent = E;
-                        GO.FireEvent(E);
+                        InventoryActionEvent.Check(out SentEvent, GO, GO, CurrentObject, "CommandDropObject");
                         ResetNameCache(GO);
                         ClearLists();
                     }
                 }
                 else
-                if ((int)keys == 131142 || (int)keys == 252 || ch == ',') // ctrl+f couldn't get in there with default value 131142. 252 works tho
+                if (keys.IsControl(Keys.F) || ch == ',' || keys.IsMouseEvent("Command:CmdFilter")) //ctrl+f
                 {
                     FilterString = Popup.AskString("Enter text to filter inventory by item name.", FilterString, 80, 0);
                     ClearLists();
                 }
                 else
-                if (keys == Keys.Delete)
+                if (keys == Keys.Delete || keys.IsMouseEvent("Command:CmdDelete"))
                 {
                     FilterString = "";
                     ClearLists();
                 }
                 else
-                if ((int)keys == 131154) // ctrl+r
+                if (keys.IsControl(Keys.R))
                 {
                     if (CurrentObject != null)
                     {
@@ -647,7 +650,7 @@ namespace XRL.UI
                     }
                 }
                 else
-                if ((int)keys == 131152) // ctrl+p
+                if (keys.IsControl(Keys.P))
                 {
                     if (CurrentObject != null)
                     {
@@ -718,7 +721,7 @@ namespace XRL.UI
                     }
                 }
                 else
-                if (keys == Keys.Subtract || keys == Keys.OemMinus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Negative"))
+                if (keys == Keys.Subtract || keys == Keys.OemMinus || keys.IsMouseEvent("Command:V Negative"))
                 {
                     foreach (QudUX_InventoryCategory Cat in CategoryList.Values)
                     {
@@ -726,7 +729,7 @@ namespace XRL.UI
                         SavedInventoryState.SetExpandState(Cat.Name, false);
                     }
                 }
-                else if (keys == Keys.Add || keys == Keys.Oemplus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Positive"))
+                else if (keys == Keys.Add || keys == Keys.Oemplus || keys.IsMouseEvent("Command:V Positive"))
                 {
                     foreach (QudUX_InventoryCategory Cat in CategoryList.Values)
                     {
@@ -752,7 +755,7 @@ namespace XRL.UI
                 {
                     AltDisplayMode = !AltDisplayMode;
                 }
-                else if (keys == (Keys.Control | Keys.M))
+                else if (keys.IsControl(Keys.M))
                 {
                     string iCategory = string.Empty;
                     if (CurrentObject != null)
@@ -796,7 +799,7 @@ namespace XRL.UI
                 {
                     if (CurrentObject != null)
                     {
-                        if (keys == (Keys.Control | Keys.E))
+                        if (keys.IsControl(Keys.E))
                         {
                             if (GO.AutoEquip(CurrentObject))
                             {
@@ -804,7 +807,7 @@ namespace XRL.UI
                             }
                         }
 
-                        if (keys == Keys.NumPad1 || keys == Keys.D1 || keys == (Keys.Control | Keys.Left) || keys == (Keys.Control | Keys.NumPad4) || keys == (Keys.Control | Keys.Subtract) || keys == (Keys.Control | Keys.OemMinus))
+                        if (keys == Keys.NumPad1 || keys == Keys.D1 || keys.IsControl(Keys.Left) || keys.IsControl(Keys.NumPad4) ||keys.IsControl(Keys.Subtract) || keys.IsControl(Keys.OemMinus))
                         {
                             //collapse the parent category for this item
                             foreach( var pair in CategoryMap )
@@ -825,7 +828,7 @@ namespace XRL.UI
                             ResetNameCache(GO);
                         }
 
-                        if (keys == Keys.Tab)
+                        if (keys == Keys.Tab || keys.IsMouseEvent("Command:Toggle"))
                         {
                             InventoryActionEvent.Check(CurrentObject, GO, CurrentObject, "Look");
                             ResetNameCache(GO);
@@ -834,13 +837,13 @@ namespace XRL.UI
 
                     if (CurrentCategory != null)
                     {
-                        if (keys == Keys.NumPad1 || keys == Keys.D1 || keys == (Keys.Control | Keys.Left) || keys == (Keys.Control | Keys.NumPad4) || keys == (Keys.Control | Keys.Subtract) || keys == (Keys.Control | Keys.OemMinus))
+                        if (keys == Keys.NumPad1 || keys == Keys.D1 ||keys.IsControl(Keys.Left) ||keys.IsControl(Keys.NumPad4) ||keys.IsControl(Keys.Subtract) ||keys.IsControl(Keys.OemMinus))
                         {
                             CurrentCategory.Expanded = false;
                             SavedInventoryState.SetExpandState(CurrentCategory.Name, false);
                         }
 
-                        if (keys == Keys.NumPad3 || keys == Keys.D3 || keys == (Keys.Control | Keys.Right) || keys == (Keys.Control | Keys.NumPad6) || keys == (Keys.Control | Keys.Add) || keys == (Keys.Control | Keys.Oemplus))
+                        if (keys == Keys.NumPad3 || keys == Keys.D3 ||keys.IsControl(Keys.Right) ||keys.IsControl(Keys.NumPad6) ||keys.IsControl(Keys.Add) ||keys.IsControl(Keys.Oemplus))
                         {
                             CurrentCategory.Expanded = true;
                             SavedInventoryState.SetExpandState(CurrentCategory.Name, true);

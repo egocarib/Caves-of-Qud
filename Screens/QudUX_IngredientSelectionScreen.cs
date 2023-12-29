@@ -58,6 +58,7 @@ namespace XRL.UI
 				_IndexInSource = index;
 			}
 
+			public IRenderable Icon;
 			public string OptionName;
 			public string CookEffect;
 			public string UseCount;
@@ -69,11 +70,11 @@ namespace XRL.UI
 			{
 				if (IsSelected)
 				{
-					return _CheckedBox + OptionName;
+					return _CheckedBox;
 				}
 				else
 				{
-					return _UncheckedBox + OptionName;
+					return _UncheckedBox;
 				}
 			}
 
@@ -169,6 +170,8 @@ namespace XRL.UI
 					LogUnique("(Error) Unable to process ingredient description for ingredient "
 						+ $"'{valueTuple.Item2?.DisplayNameStripped} for display on IngredientSelectionScreen.");
 				}
+
+				info.Icon = valueTuple.Item2.RenderForUI();
 
 				//cook effect description
 				string cookEffect = string.Empty;
@@ -311,9 +314,12 @@ namespace XRL.UI
 						}
 						else
 						{
-							string option = ingredientOptions[drawIndex].GetCheckboxString();
-							ScrapBuffer.Write(option);
-							if (ConsoleLib.Console.ColorUtility.LengthExceptFormatting(option) > 39)
+							var current = ingredientOptions[drawIndex];
+							string checkBox = current.GetCheckboxString();
+							ScrapBuffer.Write(checkBox);
+							ScrapBuffer.Write(current.Icon);
+							ScrapBuffer.Write(" " + current.OptionName);
+							if (ConsoleLib.Console.ColorUtility.LengthExceptFormatting(checkBox) > 39)
 							{
 								ScrapBuffer.Write(40, yPos, "{{y|...             }}");
 							}
@@ -425,7 +431,7 @@ namespace XRL.UI
 					selectedIngredientIndex = Math.Min(selectedIngredientIndex, ingredientOptions.Count - 1);
 					scrollOffset = Math.Min(scrollOffset, ingredientOptions.Count - 1);
 				}
-				if (keys == Keys.C || keys == (Keys.Control | Keys.Enter) || keys == (Keys.Control | Keys.Space))
+				if (keys == Keys.C || keys.IsControl(Keys.Enter) || keys.IsControl(Keys.Space))
 				{
 					if (selectedIngredientCount > 0)
 					{

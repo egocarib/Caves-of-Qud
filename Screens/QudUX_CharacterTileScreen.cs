@@ -248,14 +248,14 @@ namespace XRL.UI
                         return ScreenReturn.Exit;
                     }
                 }
-                if (keys == Keys.Add || keys == Keys.Oemplus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Positive"))
+                if (keys == Keys.Add || keys == Keys.Oemplus || keys.IsMouseEvent("Command:V Positive"))
                 {
                     if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
                         currentTiler.RotateDetailColor(1);
                     }
                 }
-                if (keys == Keys.Subtract || keys == Keys.OemMinus || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:V Negative"))
+                if (keys == Keys.Subtract || keys == Keys.OemMinus || keys.IsMouseEvent("Command:V Negative"))
                 {
                     if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
@@ -331,7 +331,7 @@ namespace XRL.UI
                 {
                     currentTiler.Flip();
                 }
-                if (keys == Keys.Oemcomma || keyChar == ',' || keys == (Keys.Control | Keys.F))
+                if (keys == Keys.Oemcomma || keyChar == ',' ||keys.IsControl(Keys.F) || keys.IsMouseEvent("Command:CmdFilter"))
                 {
                     UpdateSearchString(ref filter);
                 }

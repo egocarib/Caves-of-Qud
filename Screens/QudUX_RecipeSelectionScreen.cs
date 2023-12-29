@@ -172,9 +172,6 @@ namespace XRL.UI
 				//Respond to keyboard input
 				keys = Keyboard.getvk(Options.MapDirectionsToKeypad);
 
-				if(keys == Keys.MouseEvent)
-					QudUX.Utilities.Logger.Log(keys.ToString()+":"+Keyboard.CurrentMouseEvent.Event);
-
 
 				if (keys == Keys.Escape || keys == Keys.NumPad5)
 				{
@@ -248,7 +245,7 @@ namespace XRL.UI
 						}
 					}
 				}
-				if (keys == Keys.D || keys == Keys.Delete || (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:CmdDelete"))
+				if (keys == Keys.D || keys == Keys.Delete || keys.IsMouseEvent("Command:CmdDelete"))
 				{
 					if (Popup.ShowYesNo("{{y|Are you sure you want to forget your recipe for }}" + selectedRecipe.GetDisplayName() + "{{y|?}}") == DialogResult.Yes)
 					{
