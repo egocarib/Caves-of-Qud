@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Qud.API;
 using XRL.UI;
@@ -54,6 +55,41 @@ namespace XRL.World.Parts
             Popup.Show(text);
         }
 
+        public static void BatchMarkLegendary()
+        {
+            List<PointOfInterest> legendaryCreatures = GetPointsOfInterestEvent.GetFor(The.Player)
+            .Where(
+                point =>
+                point.Object.HasProperty("Hero") || point.Object.GetStringProperty("Role") == "Hero" && point.Object.HasPart(typeof(GivesRep))
+            ).ToList();
+
+            if(legendaryCreatures.Count == 0)
+            {
+                Popup.Show("You haven't noticed any legendary creature here.");
+                return;
+            }
+
+            if(legendaryCreatures.Count == 1)
+            {
+                MarkLegendaryLocation(legendaryCreatures[0].Object);
+                return;
+            }
+
+            string names = "";
+
+            GameObject target;
+            for(int i=0; i<legendaryCreatures.Count; i++)
+            {
+                target = legendaryCreatures[i].Object;
+                string entryText = $"{target.DisplayNameOnlyDirect}{ParentheticalListOfRelations(target)}";
+                string secret = MakeSecretId(target);
+                JournalAPI.AddMapNote(target.CurrentZone.ZoneID, entryText, "Legendary Creatures", secretId: secret, revealed: true, sold: true, silent: true);
+
+                names += target.ShortDisplayName + (i == legendaryCreatures.Count - 1 ? "" : "\n");
+            }
+            Popup.Show("{{W|You note the location of the following creatures in your journal:}}\n" + names);
+        }
+
         public static void UnmarkLegendaryLocation(GameObject target)
         {
             JournalMapNote mapNote = JournalAPI.GetMapNote(MakeSecretId(target));
@@ -91,28 +127,28 @@ namespace XRL.World.Parts
             List<string> relationList = new List<string>();
             foreach (string key in legendaryCreature.pBrain.FactionMembership.Keys)
             {
-                Faction ifExists = Factions.getIfExists(key);
+                Faction ifExists = Factions.GetIfExists(key);
                 if (ifExists != null && ifExists.Visible)
                 {
-                    relationList.Add("Loved by {{C|" + ifExists.getFormattedName() + "}}");
+                    relationList.Add("Loved by {{C|" + ifExists.GetFormattedName() + "}}");
                 }
             }
             foreach (FriendorFoe relatedFaction in repInfo.relatedFactions)
             {
-                Faction ifExists2 = Factions.getIfExists(relatedFaction.faction);
+                Faction ifExists2 = Factions.GetIfExists(relatedFaction.faction);
                 if (ifExists2 != null && ifExists2.Visible)
                 {
                     if (relatedFaction.status == "friend")
                     {
-                        relationList.Add("Admired by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Admired by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                     else if (relatedFaction.status == "dislike")
                     {
-                        relationList.Add("Disliked by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Disliked by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                     else if (relatedFaction.status == "hate")
                     {
-                        relationList.Add("Hated by {{C|" + Faction.getFormattedName(relatedFaction.faction) + "}}");
+                        relationList.Add("Hated by {{C|" + Faction.GetFormattedName(relatedFaction.faction) + "}}");
                     }
                 }
             }

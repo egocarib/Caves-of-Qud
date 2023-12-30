@@ -66,8 +66,12 @@ namespace QudUX.ScreenExtenders
             //Sets the new tile to several effects that would otherwise override it.
             if (target.HasPart(typeof(HologramMaterial)))
             {
-                HologramMaterial part = target.GetPart<HologramMaterial>();
-                part.Tile = newTile;
+                /* Vé.aisse updates
+                    HologramMaterial::Tile does not exist
+                */
+                
+                // HologramMaterial part = target.GetPart<HologramMaterial>();
+                // part.Tile = newTile;
             }
             if (target.HasPart(typeof(HologramMaterialPrimary)))
             {

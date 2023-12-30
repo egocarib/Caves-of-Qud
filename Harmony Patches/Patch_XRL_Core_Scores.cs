@@ -16,7 +16,7 @@ namespace QudUX.HarmonyPatches
             var Sequence1 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
                 new PatchTargetInstruction(OpCodes.Ldc_I4_S, (object)62),
-                new PatchTargetInstruction(OpCodes.Ldc_I4_S, (object)24, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_S, 24, 0),
                 new PatchTargetInstruction(OpCodes.Callvirt, 0), //ScreenBuffer.Goto
                 new PatchTargetInstruction(OpCodes.Pop, 0),
                 new PatchTargetInstruction(OpCodes.Ldsfld, 0),
@@ -24,7 +24,8 @@ namespace QudUX.HarmonyPatches
                 new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
                 new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
-                new PatchTargetInstruction(OpCodes.Callvirt, ScreenBuffer_Write, 0),
+                new PatchTargetInstruction(OpCodes.Ldnull, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, ScreenBuffer_Write, 1),
                 new PatchTargetInstruction(OpCodes.Pop, 0),
             });
             var Sequence2 = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
@@ -53,11 +54,12 @@ namespace QudUX.HarmonyPatches
                         yield return new CodeInstruction(OpCodes.Ldc_I4_S, 58);
                         yield return new CodeInstruction(OpCodes.Ldc_I4_S, 23);
                         yield return Sequence1.MatchedInstructions[2].Clone();
-                        yield return new CodeInstruction(OpCodes.Ldstr, "&Y[&WTab&y - Detailed Stats&Y]");
+                        yield return new CodeInstruction(OpCodes.Ldstr, "&Y[&WM&y - Detailed Stats&Y]");
                         yield return Sequence1.MatchedInstructions[6].Clone();
                         yield return Sequence1.MatchedInstructions[7].Clone();
                         yield return Sequence1.MatchedInstructions[8].Clone();
-                        yield return Sequence1.MatchedInstructions[9].Clone();
+                        yield return Sequence1.MatchedInstructions[9].Clone(); //Vé.aisse update -- Adding a ldnull to fit new screenbuffer.write signature
+                        yield return Sequence1.MatchedInstructions[10].Clone();
                         seq++;
                     }
                 }
@@ -73,13 +75,13 @@ namespace QudUX.HarmonyPatches
                     if (Sequence3.IsMatchComplete(instruction))
                     {
                         //here we are essentially adding:
-                        //   if (keys == Keys.Tab)
+                        //   if (keys == Keys.M)
                         //   {
                         //       EnhancedScoreboardExtender.ShowGameStatsScreen();
                         //       Console.DrawBuffer(Buffer, null, bSkipIfOverlay: true);
                         //   }
 
-                        yield return new CodeInstruction(OpCodes.Ldc_I4_S, 9); //Keys.Tab
+                        yield return new CodeInstruction(OpCodes.Ldc_I4_S, 77); //Keys.M
                         Label newLabel = generator.DefineLabel();
                         yield return new CodeInstruction(OpCodes.Bne_Un_S, newLabel);
                         yield return new CodeInstruction(OpCodes.Call, EnhancedScoreboardExtender_ShowGameStatsScreen);

@@ -248,16 +248,16 @@ namespace XRL.UI
                         return ScreenReturn.Exit;
                     }
                 }
-                if (keys == Keys.Add || keys == Keys.Oemplus)
+                if (keys == Keys.Add || keys == Keys.Oemplus || keys.IsMouseEvent("Command:V Positive"))
                 {
-                    if ((screenMode == ScreenMode.CoreTiles && !moreOptionSelected) || screenMode == ScreenMode.ExtendedTiles)
+                    if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
                         currentTiler.RotateDetailColor(1);
                     }
                 }
-                if (keys == Keys.Subtract || keys == Keys.OemMinus)
+                if (keys == Keys.Subtract || keys == Keys.OemMinus || keys.IsMouseEvent("Command:V Negative"))
                 {
-                    if ((screenMode == ScreenMode.CoreTiles && !moreOptionSelected) || screenMode == ScreenMode.ExtendedTiles)
+                    if (screenMode == ScreenMode.ExtendedTiles || screenMode == ScreenMode.CoreTiles)
                     {
                         currentTiler.RotateDetailColor(-1);
                     }
@@ -331,7 +331,7 @@ namespace XRL.UI
                 {
                     currentTiler.Flip();
                 }
-                if (keys == Keys.Oemcomma || keyChar == ',' || keys == (Keys.Control | Keys.F))
+                if (keys == Keys.Oemcomma || keyChar == ',' ||keys.IsControl(Keys.F) || keys.IsMouseEvent("Command:CmdFilter"))
                 {
                     UpdateSearchString(ref filter);
                 }
@@ -340,17 +340,43 @@ namespace XRL.UI
 
         private void ShowHPOptionColorWarning()
         {
-            if (XRL.UI.Options.HPColor && !HPColorWarningShown)
+            if(HPColorWarningShown) return;
+
+            string optionMsg = "";
+
+            if(Options.HPColor)
             {
-                string optionDescription = XRL.UI.Options.OptionsByID["Option@HPColor"].DisplayText;
-                if (optionDescription.EndsWith("."))
-                {
-                    optionDescription = optionDescription.Remove(optionDescription.Length - 1);
-                }
-                Popup.Show("Note: You have the {{C|" + optionDescription + "}} option turned on, so "
-                    + "the game will ignore any primary color chosen for your sprite.", LogMessage: false);
+                optionMsg += DeleteEndPeriod(Options.OptionsByID["Option@HPColor"].DisplayText) + " option";
             }
+
+            if(Options.AlwaysHPColor)
+            {
+                if(!optionMsg.IsNullOrEmpty()) 
+                {
+                    optionMsg +=" and the";
+                }
+
+                optionMsg += " "+ DeleteEndPeriod(Options.OptionsByID["Option@AlwaysHPColor"].DisplayText) + " option";
+            }
+
+            if(string.IsNullOrEmpty(optionMsg))
+                return;
+            
+                
+            Popup.Show("Note: You have the {{C|" + optionMsg + "}} turned on, so "
+                + "the game will ignore any primary color chosen for your sprite.",
+                LogMessage: false
+            );
+
             HPColorWarningShown = true;
+        }
+
+        private string DeleteEndPeriod(string target)
+        {
+            if(target.EndsWith("."))
+                target = target.Remove(target.Length - 1);
+                
+            return target;
         }
 
         private void UpdateSearchString(ref string filter)

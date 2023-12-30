@@ -14,6 +14,7 @@ using QudUX.Utilities;
 using static HarmonyLib.SymbolExtensions;
 using static HarmonyLib.AccessTools;
 using System.IO;
+using QudUX.HarmonyPatches;
 
 namespace QudUX.Concepts
 {
@@ -113,7 +114,7 @@ namespace QudUX.Concepts
             }
             public static MethodInfo QudUX_IngredientSelectionScreen_Static_Show
             {
-                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<GameObject>), default(List<bool>))); }
+                get { return GetMethodInfo(() => QudUX_IngredientSelectionScreen.Static_Show(default(List<ValueTuple<int, GameObject, string>>), default(List<bool>))); }
             }
             public static MethodInfo QudUX_RecipeSelectionScreen_Static_Show
             {
@@ -121,7 +122,7 @@ namespace QudUX.Concepts
             }
             public static MethodInfo ScreenBuffer_Write
             {
-                get { return typeof(ScreenBuffer).GetMethod("Write", new Type[] { typeof(string), typeof(bool), typeof(bool), typeof(bool) }); }
+                get { return typeof(ScreenBuffer).GetMethod("Write", new Type[] { typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(List<string>) }); }
             }
             public static MethodInfo ScreenBuffer_WriteAt
             {
@@ -222,11 +223,23 @@ namespace QudUX.Concepts
             }
             public static MethodInfo Events_OnLoadAlwaysEvent
             {
-                get { return GetMethodInfo(() => QudUX.Concepts.Events.OnLoadAlwaysEvent()); }
+                get { return GetMethodInfo(() => QudUX.Concepts.Events.AlwaysLoadEvent()); }
             }
             public static MethodInfo LookExtender_AddMarkLegendaryOptionToLooker
             {
                 get { return GetMethodInfo(() => LookExtender.AddMarkLegendaryOptionToLooker(default(ScreenBuffer), default(GameObject), default(string))); }
+            }
+            public static MethodInfo Debug_string
+            {
+                get { return GetMethodInfo(() => PatchHelpers.AddPlayerMessage(default(string))); }
+            }
+            public static MethodInfo Debug_LogInt
+            {
+                get { return GetMethodInfo(() => PatchHelpers.AddPlayerMessage(default(int))); }
+            }
+            public static MethodInfo LookExtender_ReturnModifiedString
+            {
+                get { return GetMethodInfo(() => LookExtender.ReturnModifiedString(default(string), default(GameObject))); }
             }
             public static MethodInfo LookExtender_CheckKeyPress
             {

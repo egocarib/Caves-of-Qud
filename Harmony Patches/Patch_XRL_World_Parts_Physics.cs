@@ -16,21 +16,22 @@ namespace QudUX.HarmonyPatches
         {
             var Sequence = new PatchTargetInstructionSet(new List<PatchTargetInstruction>
             {
-                new PatchTargetInstruction(OpCodes.Ldstr, "The way is blocked by "),
-                new PatchTargetInstruction(OpCodes.Call, IComponent_GameObject_AddPlayerMessage, 11)
+                new PatchTargetInstruction(OpCodes.Ldstr, "The way is blocked by ")
             });
 
             bool patched = false;
             foreach (var instruction in instructions)
             {
-                yield return instruction;
                 if (!patched && Sequence.IsMatchComplete(instruction))
                 {
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(instruction);
                     yield return new CodeInstruction(OpCodes.Callvirt, IPart_get_ParentObject);
                     yield return new CodeInstruction(OpCodes.Call, ParticleTextMaker_EmitFromPlayerIfBarrierInDifferentZone);
+                    yield return instruction.Clone();
                     patched = true;
+                    continue;
                 }
+                yield return instruction;
             }
             if (patched)
             {

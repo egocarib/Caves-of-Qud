@@ -83,7 +83,7 @@ namespace XRL.UI
                     return ScreenReturn.Exit;
                 }
 
-				if ((keys == Keys.Enter) && (currentPage == StatsPage.GamesList))
+				if (keys == Keys.Enter || keys == Keys.Space && (currentPage == StatsPage.GamesList))
 				{
 					EnhancedScoreEntry esh = ScoreList[scoreTable.Offset + scoreTable.SelectedIndex];
 					QudUX_GameDetailsScreen detailsScreen = new QudUX_GameDetailsScreen();
@@ -118,7 +118,7 @@ namespace XRL.UI
                         currentTable.MoveSelection(-1);
                     }
 
-					if (keys == (Keys.Control | Keys.A))
+					if (keys.IsControl(Keys.A))
 					{
 						showAbandonned = !showAbandonned;
             			FillTables(out scoreTable, out levelsTable, out deathCauseTable, showAbandonned );

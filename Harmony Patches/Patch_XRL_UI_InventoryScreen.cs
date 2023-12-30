@@ -16,7 +16,7 @@ namespace QudUX.HarmonyPatches
                 && !GameOptions.OverlayPrereleaseInventory
                 && XRLCore.Core.Game.Player.Body.GetConfusion() <= 0)
             {
-                __result = (new XRL.UI.QudUX_InventoryScreen()).Show(GO);
+                __result = new XRL.UI.QudUX_InventoryScreen().Show(GO);
                 return false;
             }
             return true;

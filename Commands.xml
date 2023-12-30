@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <commands>
-  <command ID="QudUX_OpenSpriteMenu" DisplayText="Modify Character Sprite" Category="QudUX"></command>
-  <command ID="QudUX_OpenAutogetMenu" DisplayText="Open Autoget Settings" Category="QudUX"></command>
-  <command ID="QudUX_OpenGameStatsMenu" DisplayText="Display Games Statistics" Category="QudUX"></command>
+  <command ID="QudUX_BatchAddLegendaryEntry" DisplayText="Add zone heroes to journal" Category="QudUX" Layer="Adventure" Auto="Down"></command>
+  <command ID="QudUX_OpenSpriteMenu" DisplayText="Modify Character Sprite" Category="QudUX" Layer="Adventure" Auto="Down"></command>
+  <command ID="QudUX_OpenAutogetMenu" DisplayText="Open Autoget Settings" Category="QudUX" Layer="Adventure" Auto="Down"></command>
+  <command ID="QudUX_OpenGameStatsMenu" DisplayText="Display Games Statistics" Category="QudUX" Layer="Adventure" Auto="Down"></command>
 </commands>

@@ -1,21 +1,29 @@
-﻿using System.Linq;
-using System.Reflection.Emit;
-using System.Collections.Generic;
+﻿using System;
+using XRL.World;
+using System.Linq;
 using HarmonyLib;
 using QudUX.Concepts;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Collections.Generic;
 using static QudUX.Concepts.Constants.MethodsAndFields;
+using static QudUX.HarmonyPatches.PatchHelpers;
 
 namespace QudUX.HarmonyPatches
 {
     /// <summary>
-    /// The following patch replaces the "cook with ingredients" and "choose recipe" selection screens
-    /// with entirely new UI screens. This is a fairly complex transpiler that modifies a number of
-    /// details in the Campfire class. Unfortunately the code that handles these menus is overly
-    /// complex, as it uses a lot of looping pop-ups instead of real menus.
+    /// 
+    /// Egocarib's version was only patching Campfire.Cook but everything has
+    /// been reworked. I kept his work for prosperity, and patched the 
+    /// new relevant methods:
+    /// • Campfire.CookFromIngredients
+    /// • Campfire.CookFromRecipe
+    /// 
     /// </summary>
     [HarmonyPatch(typeof(XRL.World.Parts.Campfire))]
-    public class Patch_XRL_World_Parts_Campfire
+    public class Patch_XRL_World_Parts_Campfire_Cooking
     {
+
         [HarmonyPrepare]
         static bool Prepare()
         {
@@ -27,6 +35,14 @@ namespace QudUX.HarmonyPatches
             }
             return true;
         }
+
+        #region OLD_PATCH
+        /// <summary>
+    /// The following patch replaces the "cook with ingredients" and "choose recipe" selection screens
+    /// with entirely new UI screens. This is a fairly complex transpiler that modifies a number of
+    /// details in the Campfire class. Unfortunately the code that handles these menus is overly
+    /// complex, as it uses a lot of looping pop-ups instead of real menus.
+    /// </summary>
 
         // This is where we find the first array parameter that we are looking for (ingredient GameObject array)
         private readonly static CodeInstruction FirstSegmentTargetInstruction = new CodeInstruction(OpCodes.Call, Campfire_GetValidCookingIngredients);
@@ -66,9 +82,9 @@ namespace QudUX.HarmonyPatches
         //max allowed distance between individual instructions in the above sequences
         private static int AllowedInstructionDistance = 20;
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("Cook")]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        // [HarmonyTranspiler]
+        // [HarmonyPatch("Cook")]
+        static IEnumerable<CodeInstruction> OldCampfirePatch(IEnumerable<CodeInstruction> instructions)
         {
             int patchSegment = 1;
             int patchSegment1_stloc_ct = 0;
@@ -272,6 +288,307 @@ namespace QudUX.HarmonyPatches
                     "Failed. This patch may not be compatible with the current game version. "
                     + "The game's default cooking UI pop-ups will be used instead of QudUX's revamped screens.");
             }
+        }
+#endregion
+        
+
+        [HarmonyTranspiler]
+        [HarmonyPatch("CookFromIngredients")]
+        static IEnumerable<CodeInstruction> Transpiler_CookFromIngredient(IEnumerable<CodeInstruction> instructions, ILGenerator gen)
+        {
+            //First we need to retrieve Tuple List that compiles all ingredients data
+            //Then we need to retrieve the list of bool representing selected ingredients
+            //Then we jump over the section that is displaying vanilla selection menu
+            //and finaly we push our custom screen
+
+            // Ingredients are stored in a List<Tuple<int, GameObject, string>>, saved on index 3
+            // It is accessible through OPCode Ldloc_3, so we don't need to look for its dedicated
+            // index. We can directly look for the list of bool
+            var Seq1 = new PatchTargetInstructionSet( new List<PatchTargetInstruction>(){
+                new PatchTargetInstruction(OpCodes.Ldloca_S),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Pop, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0), // push List<bool> on stack
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Ldloca_S, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0),
+                new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
+                new PatchTargetInstruction(OpCodes.Leave_S, 0)
+            });
+            
+            // Seq2 is used to detect the end of the section displaying vanilla selection menu
+            // It stops exactly before the loop that will evaluate selection List
+            // Which is right were we want our menu to be displayed
+            var Seq2 = new PatchTargetInstructionSet( new List<PatchTargetInstruction>()
+            {
+                new PatchTargetInstruction(OpCodes.Ldloc_S),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_1, 0),
+                new PatchTargetInstruction(OpCodes.Sub, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Br, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Bgt, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0) 
+            });
+
+            int seq=1;
+            bool patched = false;
+            CodeInstruction seq2Last = null;
+            Label jumpOverSourceDisplay = gen.DefineLabel();
+
+            foreach(CodeInstruction instruction in instructions)
+            {
+                // When completed, we do nothing.
+                // The point of this sequence is to:
+                // • Get the instruction that pushes the list<bool> of selected ingredients
+                // • Get the instruction right before the scope display source menu to setup a jump over it
+                if(seq == 1 && Seq1.IsMatchComplete(instruction))
+                {
+                    // instruction below is leave.s, originally jumping right into vanilla display section
+                    // We override its operand with our own label, so that it jumps were we want
+                    // instead of where it's supposed to. This overrides vanilla display
+                    instruction.operand = jumpOverSourceDisplay;
+                    yield return instruction;
+                    seq++;
+                    continue;
+                }
+                else if(seq == 2 && Seq2.IsMatchComplete(instruction)) // going in if Seq2 is not completed
+                {
+                    // We don't do anything when Seq2 is completed
+                    // We just want the iterator to point at the right place
+                    // ie. where List<bool> is manipulated
+                    seq++;
+                    // still keeping a ref to stop instruction because we patch right before
+                    seq2Last = instruction;
+                    continue;
+                }
+                else if(seq > 2 && !patched)
+                {   
+                    /*
+                        1.  We load the list of ingredient on the stack,
+                            and we add our label to complete the override.
+                            With this, we finalize the jump over the section
+                            displaying vanilla menu.
+                        
+                        2.  We load the list of bool representing selected
+                            ingredients on stack.
+
+                        3.  We call our custom screen method, with the last
+                            two list as parameters.
+                        
+                        4.  We push back Seq2 last instruction, to keep
+                            original logic intact.
+
+
+                        TODO ==============================================
+                        Add a check on our method return to act according
+                        to selection.
+                        ie. actually cook with selection if any, or just quit 
+                            menu (and maybe return to campfire selection popup)
+                    */
+                    Label dontQuit = gen.DefineLabel();
+                    CodeInstruction loadIngredientList = new CodeInstruction(OpCodes.Ldloc_3);
+                    loadIngredientList.labels.Add(jumpOverSourceDisplay);
+                    yield return loadIngredientList; // Push ingredient List on stack
+                    yield return Seq1.MatchedInstructions[3].Clone(); // Push
+                    yield return new CodeInstruction(OpCodes.Call, QudUX_IngredientSelectionScreen_Static_Show);
+                    yield return new CodeInstruction(OpCodes.Brtrue_S, dontQuit); // Check our ret value. If > 1, jmp to dontQuit
+                    yield return new CodeInstruction(OpCodes.Ldc_I4_0); // if < 1, load 0 on stack (false) and return
+                    yield return new CodeInstruction(OpCodes.Ret);
+                    yield return seq2Last.WithLabels(dontQuit);
+                    patched = true;
+                }
+
+                yield return instruction;
+            }
+
+            ReportPatchStatus("CookFromIngredients", patched);
+        }
+
+        [HarmonyTranspiler]
+        [HarmonyPatch("CookFromRecipe")]
+        static IEnumerable<CodeInstruction> Transpiler_CookFromRecipe(IEnumerable<CodeInstruction> instructions, ILGenerator gen)
+        {   
+            /*
+                1.  Recover List<Tuple<string, recipe>>
+                2.  Jump over vanilla display
+                3.  draw custom screen
+            */
+            
+            // Used to recover recipe list
+            var Seq1 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0),
+                new PatchTargetInstruction(OpCodes.Stloc_1),
+                new PatchTargetInstruction(OpCodes.Call),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_2, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_3, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Newobj, 0),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0) // operand is recipe list index
+            );
+
+            /*
+                This sequence detects the end of the loop filling
+                up the list of recipe.
+
+                The last instruction, Bgt_S, evaluates if the number
+                of recipe found is greater than zero. If it is,
+                it transfers control to the loop displaying vanilla
+                menu.
+
+                If it doesn't it transfer controls to vanilla "No known recipe"
+                menu.
+
+                With this sequence we'll just override Bgt_S operand, so that
+                instead of jump into vanilla display loop, it'll jump into
+                our screen display.
+
+                With this, we effectively override vanilla display while
+                keeping vanilla "No known recipe" display, which our screen
+                doesn't support.
+            */
+            var Seq2 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Call),
+                new PatchTargetInstruction(OpCodes.Brtrue_S, 0),
+                new PatchTargetInstruction(OpCodes.Leave_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloca_S, 0),
+                new PatchTargetInstruction(OpCodes.Constrained, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Endfinally, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Ldc_I4_0, 0),
+                new PatchTargetInstruction(OpCodes.Bgt_S, 0) 
+            );
+
+            // Detects the end of vanilla display
+            // Set label to last instruction to finalize override
+            var Seq3 = new PatchTargetInstructionSet(
+                new PatchTargetInstruction(OpCodes.Newobj),
+                new PatchTargetInstruction(OpCodes.Stloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0), // operand is index of the int var representing recipe index
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Ldloc_S, 0),
+                new PatchTargetInstruction(OpCodes.Callvirt, 0),
+                new PatchTargetInstruction(OpCodes.Brfalse, 0),
+                new PatchTargetInstruction(OpCodes.Call, 0)
+            );
+
+            int seq = 1;
+            Label jumpLabel = gen.DefineLabel();
+            bool patched = false;
+
+            foreach(CodeInstruction instruction in instructions)
+            {
+                if(seq == 1 && Seq1.IsMatchComplete(instruction))
+                {   
+                    seq++;
+                }
+                else
+                if(seq == 2 && Seq2.IsMatchComplete(instruction))
+                {
+                    instruction.operand = jumpLabel;
+                    yield return instruction; // Bgt_S with out jump label as operand
+                    seq++;
+                    continue;
+                }
+                else
+                if(seq > 2 && !patched && Seq3.IsMatchComplete(instruction))
+                {
+                    CodeInstruction pushList = new CodeInstruction(OpCodes.Ldloc_S, Seq1.MatchedInstructions[10].operand);
+
+                    yield return pushList.WithLabels(jumpLabel); // push recipe list on stack with label
+                    yield return new CodeInstruction(OpCodes.Call, QudUX_RecipeSelectionScreen_Static_Show); // Add screen call
+                    yield return new CodeInstruction(OpCodes.Stloc_S, Seq3.MatchedInstructions[3].operand); // Save screen result to recipe index variable
+                    yield return new CodeInstruction(OpCodes.Ldc_I4_0); // push 0 on stack
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, Seq3.MatchedInstructions[3].operand); // push index on stack
+                    Label dontQuit = gen.DefineLabel();
+                    yield return new CodeInstruction(OpCodes.Blt_S, dontQuit); // check if index > 0. if yes, dontQuit
+                    yield return new CodeInstruction(OpCodes.Ldc_I4_0); // if index < 0, push 0 on stack
+                    yield return new CodeInstruction(OpCodes.Ret); // and return
+                    yield return instruction.WithLabels(dontQuit);
+                    patched = true;
+                    continue;
+                }
+
+                yield return instruction;
+            }
+
+            ReportPatchStatus("CookFromRecipe", patched);
+        }
+
+        private static readonly Dictionary<string, bool> PatchStatuses = new Dictionary<string, bool>();
+        private static void ReportPatchStatus(string patchname, bool success)
+        {
+            PatchStatuses.Add(patchname, success);
+            if (PatchStatuses.Count >= 2)
+            {
+                int failCount = PatchStatuses.Where(s => !s.Value).Count();
+                if (failCount > 0)
+                {
+                    string msg = "both";
+                    if(failCount < 2)
+                    {
+                        msg = PatchStatuses.Where(s => !s.Value).ToArray()[0].Key;
+                    }
+                    PatchHelpers.LogPatchResult("GameObject.Move",
+                        $"Failed ({msg}). This patch may not be compatible with the current game version. "
+                        + "Some particle text effects may not be shown when movement is prevented.");
+                }
+                else
+                {
+                    PatchHelpers.LogPatchResult("GameObject.Move",
+                        "Patched successfully." /* Adds option to show particle text messages when movement is prevented for various reasons. */ );
+                }
+                PatchStatuses.Clear();
+            }
+        }
+
+        [HarmonyFinalizer]
+        [HarmonyPatch("CookFromIngredients")]
+        static void Finalizer(System.Exception __exception)
+        {
+            if(__exception != null)
+            {
+                Utilities.Logger.Log("[CookFromIngredients Patch] " + __exception.Message + "\n" + __exception.StackTrace) ;
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// I don't really know why, but without this patch, modifications
+    /// made to the Cook with recipe methods have chances to just crash
+    /// at the very end, because it calls Campfire.ForceTastyBasedOnIngredients
+    /// with a list without initializing it ? I don't know why vanilla
+    /// isn't crashing.
+    /// </summary>
+    [HarmonyPatch(typeof(XRL.World.Parts.Campfire))]
+    public class Patch_XRL_World_Parts_Campfire_ForceTastyBasedOnIngredients
+    {
+        [HarmonyTargetMethod]
+        static MethodInfo TargetMethod()
+        {
+            return AccessTools.TypeByName("XRL.World.Parts.Campfire").GetMethod("ForceTastyBasedOnIngredients", new Type[]
+            {
+                typeof(List<GameObject>)
+            });
+        }
+
+        [HarmonyPrefix]
+        static bool Prefix(List<GameObject> ingredientObjects)
+        {
+            return ingredientObjects != null;
         }
     }
 }

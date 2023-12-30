@@ -134,9 +134,9 @@ namespace QudUX.Utilities
             }
             RenderEvent renderData = new RenderEvent();
             Examiner examinerPart = go.GetPart<Examiner>();
-            if (examinerPart != null && !string.IsNullOrEmpty(examinerPart.UnknownTile) && !go.Understood())
+            if (examinerPart != null && !string.IsNullOrEmpty(examinerPart.Unknown) && !go.Understood())
             {
-                renderData.Tile = examinerPart.UnknownTile;
+                renderData.Tile = examinerPart.Unknown;
             }
             else
             {

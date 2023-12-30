@@ -66,7 +66,7 @@ namespace XRL.World.Parts
             {
                 if (IsAutogetDisabledByQudUX(E.Object))
                 {
-                    E.AddAction("Re-enable auto-pickup for this item", "re-enable auto-pickup", CmdEnableAutoget, FireOnActor: true);
+                    E.AddAction("Re-enable auto-pickup for this item", "re-enable auto-pickup", CmdEnableAutoget,FireOnActor: true);
                 }
                 else
                 {

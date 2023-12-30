@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Parts;
 using QudUX.Utilities;
 using static QudUX.Utilities.Logger;
+using XRL.Messages;
 
 namespace XRL.UI
 {
@@ -24,14 +25,14 @@ namespace XRL.UI
 		/// <summary>
 		/// Wrapper function for Show that is called from our Harmony patch
 		/// </summary>
-		public static int Static_Show(List<GameObject> ingredients, List<bool> isIngredientSelected)
+		public static int Static_Show(List<ValueTuple<int, GameObject, string>> ingredients, List<bool> isIngredientSelected)
         {
 			Show(ingredients, isIngredientSelected);
 			if (isIngredientSelected.Where(i => i == true).Count() > 0)
             {
-				return 0; //ingredients were selected
+				return 1; //ingredients were selected
             }
-			return -1; //no ingredients selected, request interface exit.
+			return 0; //no ingredients selected, request interface exit.
 		}
 
 		/// <summary>
@@ -57,6 +58,7 @@ namespace XRL.UI
 				_IndexInSource = index;
 			}
 
+			public IRenderable Icon;
 			public string OptionName;
 			public string CookEffect;
 			public string UseCount;
@@ -68,11 +70,11 @@ namespace XRL.UI
 			{
 				if (IsSelected)
 				{
-					return _CheckedBox + OptionName;
+					return _CheckedBox;
 				}
 				else
 				{
-					return _UncheckedBox + OptionName;
+					return _UncheckedBox;
 				}
 			}
 
@@ -139,34 +141,37 @@ namespace XRL.UI
 		/// array of IngredientScreenInfo data that is used for displaying those ingredients in our
 		/// custom menu.
 		/// </summary>
-		public static List<IngredientScreenInfo> GetIngredientScreenInfo(List<GameObject> ingredients, List<bool> selections)
+		public static List<IngredientScreenInfo> GetIngredientScreenInfo(List<ValueTuple<int, GameObject, string>> ingredients, List<bool> selections)
 		{
 			Dictionary<string, int> liquidAmountsOnHand = null;
 			List<IngredientScreenInfo> ingredientInfo = new List<IngredientScreenInfo>();
 			GetShortDescriptionEvent descriptionEvent = new GetShortDescriptionEvent();
 			int index = 0;
-			foreach (GameObject ing in ingredients)
+
+			foreach (ValueTuple<int, GameObject, string> valueTuple in ingredients)
 			{
 				IngredientScreenInfo info = new IngredientScreenInfo(selections, index);
-				PreparedCookingIngredient ingPart = ing?.GetPart<PreparedCookingIngredient>();
-				LiquidVolume liquid = ing?.LiquidVolume;
+				PreparedCookingIngredient ingPart = valueTuple.Item2?.GetPart<PreparedCookingIngredient>();
+				LiquidVolume liquid = valueTuple.Item2?.LiquidVolume;
 				string liquidDescription = string.Empty;
 
 				//simple ingredient name
 				if (ingPart != null)
 				{
-					info.OptionName = ing.ShortDisplayName;
+					info.OptionName = valueTuple.Item3;
 				}
 				else if (liquid != null)
 				{
 					liquidDescription = liquid.GetLiquidDescription(false);
-					info.OptionName = ing.ShortDisplayName + " " + liquidDescription;
+					info.OptionName = valueTuple.Item3 + " " + liquidDescription;
 				}
 				else
 				{
 					LogUnique("(Error) Unable to process ingredient description for ingredient "
-						+ $"'{ing?.DisplayNameStripped} for display on IngredientSelectionScreen.");
+						+ $"'{valueTuple.Item2?.DisplayNameStripped} for display on IngredientSelectionScreen.");
 				}
+
+				info.Icon = valueTuple.Item2.RenderForUI();
 
 				//cook effect description
 				string cookEffect = string.Empty;
@@ -181,7 +186,7 @@ namespace XRL.UI
 					liquid.HandleEvent(descriptionEvent);
 					cookEffect = descriptionEvent.Postfix.ToString();
 				}
-				info.CookEffect = SimplifyCookEffectDescription(cookEffect, ing);
+				info.CookEffect = SimplifyCookEffectDescription(cookEffect, valueTuple.Item2);
 
 				//number of ingredient uses remaining
 				int amount = 0;
@@ -189,8 +194,9 @@ namespace XRL.UI
 				info.UseCount = string.Empty;
 				if (ingPart != null)
 				{
-					Stacker stackInfo = ing.GetPart<Stacker>();
-					amount = stackInfo != null ? stackInfo.Number : ingPart.charges;
+					// Stacker stackInfo = ing?.Item2.GetPart<Stacker>();
+					// amount = stackInfo != null ? stackInfo.Number : ingPart.charges;
+					amount = valueTuple.Item1;
 					unit = "serving";
 				}
 				else if (liquid != null)
@@ -243,7 +249,7 @@ namespace XRL.UI
 		/// is easier to call from a Harmony patch when it's static. If we were implementing this
 		/// directly, we wouldn't make this static.
 		/// </remarks>
-		public static ScreenReturn Show(List<GameObject> ingredients, List<bool> isIngredientSelected)
+		public static ScreenReturn Show(List<ValueTuple<int, GameObject, string>> ingredients, List<bool> isIngredientSelected)
 		{
 			if (ingredients == null || ingredients.Count <= 0 || isIngredientSelected == null || isIngredientSelected.Count != ingredients.Count)
             {
@@ -308,9 +314,12 @@ namespace XRL.UI
 						}
 						else
 						{
-							string option = ingredientOptions[drawIndex].GetCheckboxString();
-							ScrapBuffer.Write(option);
-							if (ConsoleLib.Console.ColorUtility.LengthExceptFormatting(option) > 39)
+							var current = ingredientOptions[drawIndex];
+							string checkBox = current.GetCheckboxString();
+							ScrapBuffer.Write(checkBox);
+							ScrapBuffer.Write(current.Icon);
+							ScrapBuffer.Write(" " + current.OptionName);
+							if (ConsoleLib.Console.ColorUtility.LengthExceptFormatting(checkBox) > 39)
 							{
 								ScrapBuffer.Write(40, yPos, "{{y|...             }}");
 							}
@@ -422,7 +431,7 @@ namespace XRL.UI
 					selectedIngredientIndex = Math.Min(selectedIngredientIndex, ingredientOptions.Count - 1);
 					scrollOffset = Math.Min(scrollOffset, ingredientOptions.Count - 1);
 				}
-				if (keys == Keys.C || keys == (Keys.Control | Keys.Enter) || keys == (Keys.Control | Keys.Space))
+				if (keys == Keys.C || keys.IsControl(Keys.Enter) || keys.IsControl(Keys.Space))
 				{
 					if (selectedIngredientCount > 0)
 					{

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <options>
 
-  <option ID="QudUX_OptionTrackLocations" DisplayText="Track visited locations in journal" Category="QudUX" Type="Checkbox" Default="Yes"></option>
+  <!-- <option ID="QudUX_OptionTrackLocations" DisplayText="Track visited locations in journal" Category="QudUX" Type="Checkbox" Default="Yes"></option> -->
   <option ID="QudUX_OptionAskToFindQuestGivers" DisplayText="Add conversation option to help locate village quest givers" Category="QudUX" Type="Checkbox" Default="Yes"></option>
   <option ID="QudUX_OptionAskAboutRestock" DisplayText="Allow asking merchants when they will restock" Category="QudUX" Type="Checkbox" Default="Yes"></option>
   <option ID="QudUX_OptionAutogetExclusions" DisplayText="Use item interaction menu to disable auto-pickup for specific items" Category="QudUX" Type="Checkbox" Default="Yes"></option>

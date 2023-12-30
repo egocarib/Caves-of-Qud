@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using XRL.World;
+using XRL.World.Conversations;
 
 namespace QudUX.HarmonyPatches
 {
@@ -12,7 +13,7 @@ namespace QudUX.HarmonyPatches
         [HarmonyPatch("Check")]
         static void Postfix(GameObject Actor, GameObject SpeakingWith, Conversation Conversation)
         {
-            if (GameObject.validate(ref Actor) && Actor.IsPlayer() && Actor.HasRegisteredEvent("PlayerBeginConversation"))
+            if (GameObject.Validate(ref Actor) && Actor.IsPlayer() && Actor.HasRegisteredEvent("PlayerBeginConversation"))
             {
                 Actor.FireEvent(Event.New("PlayerBeginConversation", "Conversation", Conversation, "Speaker", SpeakingWith));
             }

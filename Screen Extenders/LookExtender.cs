@@ -3,6 +3,10 @@ using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
 using static XRL.World.Parts.QudUX_LegendaryInteractionListener;
+using LegacyKeyCode = ControlManager.LegacyKeyCode;
+using KeyCode = UnityEngine.KeyCode;
+using UnityEngine.XR;
+using Qud.UI;
 
 namespace QudUX.ScreenExtenders
 {
@@ -14,17 +18,63 @@ namespace QudUX.ScreenExtenders
         {
             if ((target.HasProperty("Hero") || target.GetStringProperty("Role") == "Hero") && target.HasPart(typeof(GivesRep)))
             {
-                if ((Keys)LegacyKeyMapping.GetKeyFromCommand("CmdWalk") != Keys.M)
+                LegacyKeyCode buttonA = ControlManager.mapCommandToPrimaryLegacyKeycode("CmdWalk");
+
+                if (buttonA.code != KeyCode.M)
                 {
                     MarkKey = Keys.M;
                     buffer.WriteAt(1, 0, uiHotkeyString + " | {{hotkey|M}} - mark in journal");
                 }
-                else if ((Keys)LegacyKeyMapping.GetKeyFromCommand("CmdWalk") != Keys.J)
+                else if (buttonA.code != KeyCode.J)
                 {
                     MarkKey = Keys.J;
                     buffer.WriteAt(1, 0, uiHotkeyString + " | {{hotkey|J}} - mark in journal");
                 }
             }
+        }
+
+        public static string ReturnModifiedString(string uiHotkeyString, GameObject target)
+        {
+            if(target == null) return uiHotkeyString;
+            
+            if ((target.HasProperty("Hero") || target.GetStringProperty("Role") == "Hero") && target.HasPart(typeof(GivesRep)))
+            {
+                LegacyKeyCode buttonA = ControlManager.mapCommandToPrimaryLegacyKeycode("CmdWalk");
+
+                if (buttonA.code != KeyCode.M)
+                {
+                    MarkKey = Keys.M;
+                    uiHotkeyString += " | {{hotkey|M}} - mark in journal";
+                }
+                else if (buttonA.code != KeyCode.J)
+                {
+                    MarkKey = Keys.J;
+                    uiHotkeyString += " | {{hotkey|J}} - mark in journal";
+                }
+            }
+            
+            return uiHotkeyString;
+        }
+
+        public static void SetModerUIText(string uiHotkeyString, GameObject target)
+        {
+            if ((target.HasProperty("Hero") || target.GetStringProperty("Role") == "Hero") && target.HasPart(typeof(GivesRep)))
+            {
+                LegacyKeyCode buttonA = ControlManager.mapCommandToPrimaryLegacyKeycode("CmdWalk");
+
+                if (buttonA.code != KeyCode.M)
+                {
+                    MarkKey = Keys.M;
+                    uiHotkeyString += " | {{hotkey|M}} - mark in journal";
+                }
+                else if (buttonA.code != KeyCode.J)
+                {
+                    MarkKey = Keys.J;
+                    uiHotkeyString += " | {{hotkey|J}} - mark in journal";
+                }
+            }
+
+            // PickTargetWindow.currentText = uiHotkeyString;
         }
 
         public static bool CheckKeyPress(Keys key, GameObject target, bool currentKeyFlag)

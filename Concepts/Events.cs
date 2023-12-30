@@ -24,17 +24,13 @@ namespace QudUX.Concepts
         {
 
         }
-
+        
         //Runs in all load scenarios - called immediately after each of the events above.
-        public static void OnLoadAlwaysEvent()
+        public static void AlwaysLoadEvent() => AlwaysLoadEvent("Starting game");
+
+        public static void AlwaysLoadEvent(string context)
         {
-            if (Player != null)
-            {
-                Player.RequirePart<QudUX_AutogetHelper>();
-                Player.RequirePart<QudUX_CommandListener>();
-                Player.RequirePart<QudUX_ConversationHelper>();
-                Player.RequirePart<QudUX_LegendaryInteractionListener>();
-            }
+            
         }
     }
 }

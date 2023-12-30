@@ -159,6 +159,7 @@ namespace QudUX.ScreenExtenders
                     return false;
                 }
                 TabCategories["Other"].Remove(category);
+                Holder.RequirePart<QudUX_InventoryScreenState>().CategoriesInOtherTab.Remove(category);
                 UpdateCategoryMappings();
                 return true;
             }
