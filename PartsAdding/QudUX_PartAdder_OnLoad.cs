@@ -19,6 +19,7 @@ namespace XRL
                 player.RequirePart<QudUX_CommandListener>();
                 player.RequirePart<QudUX_ConversationHelper>();
                 player.RequirePart<QudUX_LegendaryInteractionListener>();
+                player.RequirePart<QudUX_QuickPickupPart>();
 
                 QudUX.Utilities.Logger.Log("Ensured Parts on player through Game Loaded callback");
             }

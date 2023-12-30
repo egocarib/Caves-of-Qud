@@ -13,6 +13,7 @@ namespace XRL
             player.AddPart<QudUX_CommandListener>();
             player.AddPart<QudUX_ConversationHelper>();
             player.AddPart<QudUX_LegendaryInteractionListener>();
+            player.AddPart<QudUX_QuickPickupPart>();
 
             QudUX.Utilities.Logger.Log("Added parts on player through mutator");
         }

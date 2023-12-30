@@ -21,6 +21,7 @@ namespace QudUX.Concepts
     [HasModSensitiveStaticCache]
     public static class Constants
     {
+        public static string QuickPickupProperty = "QuickPickup_ShouldGet";
         public static string AbilityDataFileName => "QudUX_AbilityData.xml";
 
         public static string AutogetDataFileName => "QudUX_AutogetSettings.json";
