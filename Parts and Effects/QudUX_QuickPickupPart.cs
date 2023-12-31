@@ -1,9 +1,8 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleLib.Console;
+using HarmonyLib;
 using QudUX.Concepts;
 using XRL.Core;
 using XRL.UI;
@@ -15,7 +14,9 @@ namespace XRL.World.Parts
     {
         private const string _DisplaySettings = "QudUX_OpenQuickPickupSettingsMenu";
         private const string _DisplayQuickMenu = "QudUX_OpenQuickPickupQuickMenu";
+        public int LastSelectedTab = 0;
 
+        // Look for int property
         public Dictionary<string, ValueTuple<bool, string>> TierSettings = new Dictionary<string, ValueTuple<bool, string>>
         {
             { "Tier 0", (true, "0") },
@@ -29,18 +30,19 @@ namespace XRL.World.Parts
             { "Tier 8", (true, "8") },
         };
 
-
-        // Look for inheritance of time Tuple.Item2
+        // Look for inheritance of Tuple.Item2
         public Dictionary<string, ValueTuple<bool, string>> TypesSettings = new Dictionary<string, ValueTuple<bool, string>>
         {
-            { "Axes",           (true, "BaseAxe") },
-            { "Daggers",        (true, "BaseDagger") },
-            { "Cudgels",        (true, "BaseCudgel") },
-            { "Pistols",        (true, "BasePistol") },
-            { "Rifles",         (true, "BaseRifle") },
-            { "Heavy Weapons",  (true, "BaseHeavyWeapon") },
-            { "Bows",           (true, "BaseBow") },
-            { "Shields",        (true, "BaseShield") },
+            { "Tools",              (true, "Tool") },
+            { "Axes",               (true, "BaseAxe") },
+            { "Daggers",            (true, "BaseDagger") },
+            { "Long Blades",        (true, "BaseLongBlade") },
+            { "Cudgels",            (true, "BaseCudgel") },
+            { "Shields",            (true, "BaseShield") },
+            { "Heavy Weapons",      (true, "BaseHeavyWeapon") },
+            { "Bows",               (true, "BaseBow") },
+            { "Pistols",            (true, "BasePistol") },
+            { "Rifles",             (true, "BaseRifle") },
         };
 
         // Look for part "Armor" worn on Tuple.item2
@@ -70,7 +72,7 @@ namespace XRL.World.Parts
         {
             if (E.ID == _DisplayQuickMenu)
             {
-                GoToNextCell();
+                BuildPopup();
             }
 
             if (E.ID == _DisplaySettings)
@@ -82,131 +84,230 @@ namespace XRL.World.Parts
             return base.FireEvent(E);
         }
 
-        private void GoToNextCell()
+        private void BuildPopup()
         {
-            List<GameObject> selection = new List<GameObject>();
-            List<GameObject> exclusions = new List<GameObject>();
-            Func<GameObject, string, bool> predicate;
-
-            foreach (Cell c in ParentObject.CurrentZone.GetExploredCells())
-            {   
-                // Filtering on Tier tag value
-                // Simple Tier filtering
-                predicate = (GameObject candidate, string value) => candidate.HasTag("Tier") && candidate.GetTier() ==  int.Parse(value);
-                GetObjectsFiltered(
-                    c,
-                    TierSettings,
-                    selection,
-                    exclusions,
-                    predicate
-                );
-
-                // Filtering on candidate inheritance
-                // used to see if weapons inherits from some baseObject
-                predicate = (GameObject candidate, string value) => candidate.GetBlueprint().InheritsFrom(value);
-                GetObjectsFiltered(
-                    c,
-                    TypesSettings,
-                    selection,
-                    exclusions,
-                    predicate
-                );
-
-                // Filtering armor based on their body target
-                predicate = (GameObject candidate, string value) =>
-                {
-                    if (candidate.TryGetPart(out Armor armor))
-                    {
-                        return armor.WornOn == value;
-                    }
-                    return false;
-                };
-
-                GetObjectsFiltered(
-                    c,
-                    ArmorSettings,
-                    selection,
-                    exclusions,
-                    predicate
-                );
-            }
-
-            if (selection.Count > 0)
+            List<GameObject> selection = null;
+            foreach (Cell currentCell in ParentObject.CurrentZone.GetExploredCells())
             {
-                selection.OrderByDescending(obj =>
-                {
-                    if(!obj.HasTag("Tier")) return 0;
-                    return obj.GetTier();
-                });
+                List<GameObject> candidates = new List<GameObject>();
+                candidates.AddRange(currentCell.GetObjectsThatInheritFrom("Armor"));
+                candidates.AddRange(currentCell.GetObjectsThatInheritFrom("MeleeWeapon"));
+                candidates.AddRange(currentCell.GetObjectsThatInheritFrom("MissileWeapon"));
+                candidates.AddRange(currentCell.GetObjectsThatInheritFrom("Shield"));
+                candidates.AddRange(currentCell.GetObjectsThatInheritFrom("Tool"));
 
-                List<string> options = new List<string>();
-                foreach (var obj in selection)
-                    options.Add(obj.BaseDisplayName);
-
-                List<IRenderable> icons = new List<IRenderable>();
-                foreach (var obj in selection)
-                    icons.Add(obj.RenderForUI());
-
-                List<int> results = Popup.PickSeveral(
-                    "Which item do you want to get ?",
-                    options.ToArray(),
-                    AllowEscape: true,
-                    Icons: icons.ToArray()
+                FilterObjectsOnCell(
+                    TypesSettings,
+                    candidates,
+                    // Filtering on candidate inheritance
+                    (GameObject candidate, string value) =>
+                        candidate.GetBlueprint().InheritsFrom(value)
                 );
 
-                foreach (int index in results)
+                FilterObjectsOnCell(
+                    ArmorSettings,
+                    candidates,
+                    // Filtering armor based on their targeted body part
+                    (GameObject candidate, string value) =>
+                    {
+                        if (candidate.TryGetPart(out Armor armor))
+                        {
+                            return armor.WornOn == value;
+                        }
+                        return false;
+                    }
+                );
+
+                FilterObjectsOnCell(
+                    TierSettings,
+                    candidates,
+                    // Filtering on Tier tag value
+                    (GameObject candidate, string value) =>
+                        candidate.HasTag("Tier") && candidate.GetTier() == int.Parse(value)
+                );
+
+                if (candidates.Count > 0)
                 {
-                    GameObject current = selection[index];
+                    if (selection == null)
+                        selection = new List<GameObject>();
 
-                    if (current.HasIntProperty("NoAutoget"))
-                        current.RemoveIntProperty("NoAutoget");
-
-                    if (current.HasIntProperty("DroppedByPlayer"))
-                        current.RemoveIntProperty("DroppedByPlayer");
-
-                    if (current.HasIntProperty("Autoexplored"))
-                        current.RemoveIntProperty("Autoexplored");
-
-                    AutoAct.SetAutoexploreSuppression(current, false);
-                    AutoAct.SetAutoexploreActionProperty(current, "Autoget", -1);
-                    current.SetStringProperty(Constants.QuickPickupProperty, "yes");
+                    selection.AddRange(candidates);
                 }
 
-                The.Player.CurrentZone.FlushNavigationCaches();
-                AutoAct.Setting = "?";
-                ActionManager.SkipPlayerTurn = true;
+            }
+
+            if (selection == null)
+            {
+                Popup.Show("There is nothing of interest to pick up here...");
                 return;
             }
 
-            Popup.Show("There is nothing of interest to pick up here...");
+            foreach(var obj in selection)
+            {
+                QudUX.Utilities.Logger.Log(obj.ShortDisplayName);
+            }
+            
+            QudUX.Utilities.Logger.Log("#################");
+
+            var meleeTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MeleeWeapon"))
+                            .GroupBy(obj => obj.GetBlueprint().Inherits);
+                            
+            var rangedTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MissileWeapon"))
+                            .GroupBy(obj => obj.GetBlueprint().Inherits);
+
+            var armorTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("Armor"))
+                            .GroupBy(obj => obj.GetBlueprint().Inherits);
+
+            selection = new List<GameObject>();
+
+            foreach(var group in meleeTypes)
+            {
+                selection.AddRange(group.OrderByDescending(obj => 
+                {
+                    if(!obj.HasTag("Tier")) return 0;
+                    return obj.GetTier();
+                }));
+            }
+
+            foreach(var group in rangedTypes)
+            {
+                selection.AddRange(group.OrderByDescending(obj =>
+                {
+                    if(!obj.HasTag("Tier")) return 0;
+                    return obj.GetTier();
+                }));
+            }
+
+            foreach(var group in armorTypes)
+            {
+                selection.AddRange(group.OrderByDescending(obj =>
+                {
+                    if(!obj.HasTag("Tier")) return 0;
+                    return obj.GetTier();
+                }));
+            }
+
+            List<string> options = new List<string>();
+            foreach (var obj in selection)
+                options.Add(obj.BaseDisplayName);
+
+            List<IRenderable> icons = new List<IRenderable>();
+            foreach (var obj in selection)
+                icons.Add(obj.RenderForUI());
+
+            List<int> results = Popup.PickSeveral(
+                "Which item do you want to get ?",
+                options.ToArray(),
+                AllowEscape: true,
+                Icons: icons.ToArray()
+            );
+
+            if(results == null || results.Count == 0) return;
+
+
+            foreach (int index in results)
+            {
+                GameObject current = selection[index];
+
+                if (current.HasIntProperty("NoAutoget"))
+                    current.RemoveIntProperty("NoAutoget");
+
+                if (current.HasIntProperty("DroppedByPlayer"))
+                    current.RemoveIntProperty("DroppedByPlayer");
+
+                if (current.HasIntProperty("Autoexplored"))
+                    current.RemoveIntProperty("Autoexplored");
+
+                AutoAct.SetAutoexploreSuppression(current, false);
+                AutoAct.SetAutoexploreActionProperty(current, "Autoget", -1);
+                current.SetStringProperty(Constants.QuickPickupProperty, "yes");
+            }
+
+            The.Player.CurrentZone.FlushNavigationCaches();
+            AutoAct.Setting = "?";
+            ActionManager.SkipPlayerTurn = true;
         }
 
-        private void GetObjectsFiltered(Cell targetCell, Dictionary<string, ValueTuple<bool, string>> settings, List<GameObject> selectedObjects, List<GameObject> excludedObjects, Func<GameObject, string, bool> predicate)
+        public override void LoadData(SerializationReader Reader)
         {
-            // Getting all objects on currentCell
-            var allObjects = targetCell.GetObjectsThatInheritFrom("Item");
-            foreach(var key in settings.Keys)
-            {
-                // Removing already excluded objects so far
-                allObjects = allObjects.Where(obj => !excludedObjects.Contains(obj)).ToList();
+            base.LoadData(Reader);
 
+            Dictionary<string, ValueTuple<bool, string>> newSettings = new Dictionary<string, ValueTuple<bool, string>>();
+            foreach (var key in TierSettings.Keys)
+            {
+                newSettings.Add(
+                    key,
+                    (Reader.ReadBoolean(), TierSettings[key].Item2)
+                );
+            }
+            TierSettings = newSettings;
+
+            newSettings = new Dictionary<string, ValueTuple<bool, string>>();
+            foreach (var key in TypesSettings.Keys)
+            {
+                newSettings.Add(
+                    key,
+                    (Reader.ReadBoolean(), TypesSettings[key].Item2)
+                );
+            }
+            TypesSettings = newSettings;
+
+            newSettings = new Dictionary<string, ValueTuple<bool, string>>();
+            foreach (var key in ArmorSettings.Keys)
+            {
+                newSettings.Add(
+                    key,
+                    (Reader.ReadBoolean(), ArmorSettings[key].Item2)
+                );
+            }
+            ArmorSettings = newSettings;
+        }
+
+        public override void SaveData(SerializationWriter Writer)
+        {
+            base.SaveData(Writer);
+
+            foreach (var key in TierSettings.Keys)
+            {
+                bool value = TierSettings[key].Item1;
+                Log($"TierSettings for: {key}={value}");
+                Writer.Write(value);
+            }
+
+            foreach (var key in TypesSettings.Keys)
+            {
+                bool value = TypesSettings[key].Item1;
+                Log($"TierSettings for: {key}={value}");
+                Writer.Write(value);
+            }
+
+            foreach (var key in ArmorSettings.Keys)
+            {
+                bool value = ArmorSettings[key].Item1;
+                Log($"TierSettings for: {key}={value}");
+                Writer.Write(value);
+            }
+        }
+
+        private void FilterObjectsOnCell(Dictionary<string, ValueTuple<bool, string>> settings, List<GameObject> candidates, Func<GameObject, string, bool> predicate)
+        {
+            List<GameObject> filteredObjects = new List<GameObject>();
+            foreach (var key in settings.Keys)
+            {
                 //Step out if we don't have any other object
-                if(allObjects.Count == 0) return;
+                if (candidates.Count == 0) return;
 
                 var tuple = settings[key];
 
                 // Filtering candidates using passed on predicate, fed with tuple value
-                var candidates = allObjects.Where(obj => predicate(obj, tuple.Item2));
+                filteredObjects = candidates.Where(obj => predicate(obj, tuple.Item2)).ToList();
 
-                // Exclude what we found if disabled in settings
-                if(!tuple.Item1)
+                // if filter is set to disabled, remove found objects from candidates
+                if (!tuple.Item1)
                 {
-                    excludedObjects.AddRange(candidates);
-                    continue;
+                    foreach (GameObject obj in filteredObjects)
+                        candidates.Remove(obj);
                 }
-
-                // Add them to selection otherwise
-                selectedObjects.AddRange(candidates);
             }
         }
     }

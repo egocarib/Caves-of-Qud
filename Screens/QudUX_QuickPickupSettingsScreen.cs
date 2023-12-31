@@ -1,20 +1,22 @@
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using ConsoleLib.Console;
 using XRL.World;
 using XRL.World.Parts;
+using QudUX.Utilities;
 
 namespace XRL.UI
 {
-    [UIView("QudUX:QuickPickupSettings", ForceFullscreen: false, NavCategory: "Menu", UICanvas: null)]
+    [UIView("QudUX:QuickPickupSettings", ForceFullscreen: true, NavCategory: "Menu", UICanvas: null)]
     public class QudUX_QuickPickupSettingsScreen : IScreen, IWantsTextConsoleInit
     {
         private static readonly Dictionary<string, string> _ItemDescription = new Dictionary<string, string>()
         {
             { "Tier 0",             "&yEvery {{w|Bronze}} item"},
-            { "Tier 1",             "&yIron mace, Stun rod, Desert Kris, Iron Vinereaper, Stun & Leather whips, Iron long swords... The least powerful of Iron Items"},
-            { "Tier 2",             "&ySome more powerful Iron items like the Two handed axe"},
+            { "Tier 1",             "&y{{W|Short Bow}} and least powerful {{W|Iron}} equipment and weapons"},
+            { "Tier 2",             "&y{{W|Revolver}}, {{W|Musket}}, {{W|Compound Bow}}... And steel {{W|Steel}} equipment and weapons"},
             { "Tier 3",             "&y{{b|Carbide}} equipment and weapons"},
             { "Tier 4",             "&y{{B|Folded Carbide}} equipment and weapons"},
             { "Tier 5",             "&y{{K|Fullerite}} equipment and weapons"},
@@ -29,15 +31,16 @@ namespace XRL.UI
             { "Feet",               "&yAll {{W|Feet armor}} of the game"},
             { "Back",               "&yAll {{W|Back armor}} of the game"},
             { "Floating Nearby",    "&yAll {{W|Floating Nearby items}} of the game"},
+            { "Tools",              "&yAll {{W|Tools}} of various purpose, toolkits, Hoversled, portable wall, tatoo gun..."},
             { "Axes",               "&yAll {{W|Axes}} items"},
             { "Daggers",            "&yAll {{W|Daggers}} of the game"},
+            { "Long Blades",        "&yAll {{W|Long Blades}} of the game"},
             { "Cudgels",            "&yAll {{W|Cudgels}} of the game"},
             { "Pistols",            "&yAll {{W|Pistols}} of the game"},
             { "Rifles",             "&yAll {{W|Rifles}} of the game"},
             { "Heavy Weapons",      "&yAll {{W|Heavy Weapons}} of the game"},
             { "Bows",               "&yAll {{W|Bows}} of the game"},
             { "Shields",            "&yAll {{W|Shields}} of the game"},
-            { "Armor",              "&yAll {{W|Armor}} of the game"},
         };
 
         private static TextConsole _Console;
@@ -56,8 +59,6 @@ namespace XRL.UI
         {
             GameManager.Instance.PushGameView("QudUX:QuickPickupSettings");
             bool stepOut = false;
-
-            int tabFocus = 0;
             int selection = 1;
 
             if (!GO.TryGetPart<QudUX_QuickPickupPart>(out var part))
@@ -69,14 +70,15 @@ namespace XRL.UI
             {
                 _Buffer.Clear();
                 _Buffer.SingleBox(0, 0, 79, 2, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
-                _Buffer.SingleBox(0, 2, 79, 14, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
-                _Buffer.SingleBox(0, 14, 79, 24, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
+                _Buffer.SingleBox(0, 2, 79, 17, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
+                _Buffer.SingleBox(0, 17, 79, 24, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
 
                 string a = "&yYou can decide here {{W|which items}} you want to be listed in";
                 string b = "&ythe {{W|Quick Pickup-up QuickMenu}}. Items can either be filtered";
                 string c = "&yby their {{W|Tier}} or by their {{W|Type}}. Both filters will be";
                 string d = "&y{{W|combined additively}} when scanning nearby items.";
-                int height = ((9 - 4) / 2) + 15;
+                
+                int height = ((7 - 4) / 2) + 18;
                 _Buffer.Goto(GetCenteredOffsetForString(a), height);
                 _Buffer.Write(a);
                 _Buffer.Goto(GetCenteredOffsetForString(b), ++height);
@@ -88,63 +90,63 @@ namespace XRL.UI
 
                 _Buffer.Goto(0, 2);
                 _Buffer.Write(195);
-                _Buffer.Goto(0, 14);
+                _Buffer.Goto(0, 17);
                 _Buffer.Write(195);
 
                 _Buffer.Goto(79, 2);
                 _Buffer.Write(180);
-                _Buffer.Goto(79, 14);
+                _Buffer.Goto(79, 17);
                 _Buffer.Write(180);
 
 
                 string title = "{{y|[ {{W|Quick Pick-up Settings}} ]}}";
-                int startPos = GetCenteredOffsetForString(title);
-                _Buffer.Goto(startPos, 0);
+                _Buffer.Goto(1, 0);
                 _Buffer.Write(title);
-
-                int third = (80 / 3) - 1;
 
                 string tierTabTitle;
                 string itemTypesTabTitle;
                 string armorTabTitle;
 
-                if (tabFocus == 0)
+                if (part.LastSelectedTab == 0)
                 {
                     itemTypesTabTitle = "{{W|> Weapons <}}";
                     tierTabTitle = "{{y|Tiers}}";
-                    armorTabTitle = "{{y|Armor}}";
+                    armorTabTitle = "{{y|Equipment}}";
                 }
                 else
-                if (tabFocus == 1)
+                if (part.LastSelectedTab == 1)
                 {
                     itemTypesTabTitle = "{{y|Weapons}}";
-                    armorTabTitle = "{{W|> Armor <}}";
+                    armorTabTitle = "{{W|> Equipment <}}";
                     tierTabTitle = "{{y|Tiers}}";
                 }
                 else
                 {
-
                     itemTypesTabTitle = "{{y|Weapons}}";
-                    armorTabTitle = "{{y|Armor}}";
+                    armorTabTitle = "{{y|Equipment}}";
                     tierTabTitle = "{{W|> Tiers <}}";
                 }
 
-                startPos = (third - ColorUtility.StripFormatting(itemTypesTabTitle).Length) / 2;
+                
+
+                int third = 78 / 3;
+
+                int startPos = 1 + (third - ColorUtility.LengthExceptFormatting(itemTypesTabTitle)) / 2;
                 _Buffer.Goto(startPos, 1);
                 _Buffer.Write(itemTypesTabTitle);
 
-                startPos = (third - ColorUtility.StripFormatting(armorTabTitle).Length) / 2;
-                _Buffer.Goto(third + startPos, 1);
+                startPos = third + (third - ColorUtility.LengthExceptFormatting(armorTabTitle)) / 2;
+                _Buffer.Goto(startPos, 1);
                 _Buffer.Write(armorTabTitle);
 
-                startPos = (third - ColorUtility.StripFormatting(tierTabTitle).Length) / 2;
-                _Buffer.Goto(2 * third + startPos, 1);
+                startPos = -1 + 2*third + (third - ColorUtility.LengthExceptFormatting(tierTabTitle)) / 2;
+                _Buffer.Goto(startPos, 1);
                 _Buffer.Write(tierTabTitle);
 
                 int index = 0;
 
                 Dictionary<string, ValueTuple<bool, string>> targetObjects = default;
-                switch (tabFocus)
+                switch (part.LastSelectedTab)
                 {
                     case 0:
                         targetObjects = part.TypesSettings;
@@ -157,7 +159,7 @@ namespace XRL.UI
                         break;
                 }
 
-                if(selection >= targetObjects.Count)
+                if (selection >= targetObjects.Count)
                     selection = targetObjects.Count - 1;
 
                 string currentKey = "";
@@ -171,49 +173,64 @@ namespace XRL.UI
                 }
 
                 _Buffer.Goto(_ItemDescriptionSectionStart.x, _ItemDescriptionSectionStart.y);
-                int maxWidth = 80 - (_ItemDescriptionSectionStart.x - 2);
+                int maxWidth = 78 - _ItemDescriptionSectionStart.x;
 
                 string[] words = _ItemDescription[currentKey].Split(" ");
                 List<string> lines = new List<string>();
                 lines.Add("");
+                
                 for (int i = 0; i < words.Length; i++)
                 {
-                    if (lines[lines.Count - 1].Length + ColorUtility.StripFormatting(words[i]).Length + 1 >= maxWidth)
+                    if (ColorUtility.LengthExceptFormatting(lines[lines.Count - 1] + words[i]) + 1 >= maxWidth)
                     {
-                        lines.Add(words[i] + " ");
+                        lines.Add(words[i]);
+                        
+                        if(i < words.Length-1)
+                            lines[lines.Count - 1] += " ";
                         continue;
                     }
-
-                    lines[lines.Count - 1] += words[i] + " ";
+                    
+                    lines[lines.Count - 1] += words[i];
+                    if(i < words.Length-1)
+                        lines[lines.Count - 1] += " ";
                 }
 
-                int initHeight = (12 - lines.Count) / 2;
+                int initHeight = (15 - lines.Count) / 2;
+                int xOffset = (80 - _ItemDescriptionSectionStart.x - ColorUtility.LengthExceptFormatting(lines.OrderByDescending(s => s.Length).ToArray()[0])) / 2;
                 for (int i = 0; i < lines.Count; i++)
                 {
-                    _Buffer.Goto(_ItemDescriptionSectionStart.x, _ItemDescriptionSectionStart.y + initHeight + i);
+                    _Buffer.Goto(_ItemDescriptionSectionStart.x + xOffset, _ItemDescriptionSectionStart.y + initHeight + i);
                     _Buffer.Write(lines[i]);
                 }
 
-                _Buffer.Goto(0, 0);
+                int half = 80 / 2;
+                string enableAll = "&y{{W|E}}nable All";
+                _Buffer.Goto((half - ColorUtility.LengthExceptFormatting(enableAll)) / 2, 16);
+                _Buffer.Write(enableAll);
 
+                string disableAll = "&y{{W|D}}isable All";
+                _Buffer.Goto(half + (half - ColorUtility.LengthExceptFormatting(disableAll) )/ 2, 16);
+                _Buffer.Write(disableAll);
+
+                _Buffer.EscOr5ToExit();
                 _Console.DrawBuffer(_Buffer);
 
                 Keys keys = Keyboard.getvk(Options.MapDirectionsToKeypad);
 
                 if (keys == Keys.MouseEvent && Keyboard.CurrentMouseEvent.Event == "Command:Toggle")
                 {
-                    tabFocus = ++tabFocus % 3;
+                    part.LastSelectedTab = ++part.LastSelectedTab % 3;
                 }
                 if (keys == Keys.NumPad6)
                 {
-                    if (tabFocus < 2)
-                        tabFocus = ++tabFocus;
+                    if (part.LastSelectedTab < 2)
+                        part.LastSelectedTab = ++part.LastSelectedTab;
                 }
                 else
                 if (keys == Keys.NumPad4)
                 {
-                    if (tabFocus > 0)
-                        tabFocus = --tabFocus;
+                    if (part.LastSelectedTab > 0)
+                        part.LastSelectedTab = --part.LastSelectedTab;
                 }
                 else
                 if (keys == Keys.NumPad2 || keys == Keys.Down)
@@ -242,6 +259,16 @@ namespace XRL.UI
                     }
 
                     targetObjects[tKey] = (!targetObjects[tKey].Item1, targetObjects[tKey].Item2);
+                }
+                else
+                if (keys == Keys.D)
+                {
+                    SetAllValuesTo(false, targetObjects);
+                }
+                else
+                if (keys == Keys.E)
+                {
+                    SetAllValuesTo(true, targetObjects);
                 }
                 else
                 if (keys == Keys.Escape || keys == Keys.NumPad5)
@@ -282,7 +309,16 @@ namespace XRL.UI
 
         private int GetCenteredOffsetForString(string s, int sectionWidth = 80)
         {
-            return (sectionWidth - ColorUtility.StripFormatting(s).Length) / 2;
+            return (sectionWidth - ColorUtility.LengthExceptFormatting(s)) / 2;
+        }
+
+        private void SetAllValuesTo(bool value, Dictionary<string, ValueTuple<bool, string>> objects)
+        {
+            var k = objects.Keys.ToArray();
+            for (int i = 0; i < k.Length; i++)
+            {
+                objects[k[i]] = (value, objects[k[i]].Item2);
+            }
         }
 
         private void DisplayLine(string name, bool state, int heightOffset, bool isSelected)
