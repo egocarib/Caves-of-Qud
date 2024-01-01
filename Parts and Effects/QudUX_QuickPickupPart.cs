@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConsoleLib.Console;
 using HarmonyLib;
+using QudUX.AutoActActions;
 using QudUX.Concepts;
 using XRL.Core;
 using XRL.UI;
@@ -60,7 +61,6 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object)
         {
-            Object.RegisterPartEvent(this, "CommandTakeObject");
             Object.RegisterPartEvent(this, _DisplayQuickMenu);
             Object.RegisterPartEvent(this, _DisplaySettings);
 
@@ -69,16 +69,6 @@ namespace XRL.World.Parts
 
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "CommandTakeObject")
-            {
-                GameObject g = E.GetParameter("Object") as GameObject;
-
-                if (g.GetIntProperty(Constants.QuickPickupProperty)>0)
-                {
-                    g.GetIntProperty(Constants.QuickPickupProperty);
-                }
-            }
-
             if (E.ID == _DisplayQuickMenu)
             {
                 BuildPopup();
@@ -189,28 +179,13 @@ namespace XRL.World.Parts
 
             if (results == null || results.Count == 0) return;
 
+            var selectedItems = new List<GameObject>();
 
             foreach (int index in results)
-            {
-                GameObject current = selection[index];
+                selectedItems.Add(selection[index]);
 
-                if (current.HasIntProperty("NoAutoget"))
-                    current.RemoveIntProperty("NoAutoget");
-
-                if (current.HasIntProperty("DroppedByPlayer"))
-                    current.RemoveIntProperty("DroppedByPlayer");
-
-                if (current.HasIntProperty("Autoexplored"))
-                    current.RemoveIntProperty("Autoexplored");
-
-                AutoAct.SetAutoexploreSuppression(current, false);
-                AutoAct.SetAutoexploreActionProperty(current, "Autoget", -1);
-                current.SetIntProperty(Constants.QuickPickupProperty, 1);
-            }
-
-            The.Player.CurrentZone.FlushNavigationCaches();
-            AutoAct.Setting = "?";
-            ActionManager.SkipPlayerTurn = true;
+            AutoAct.Action = new PickupSelection(selectedItems, ParentObject);
+            ParentObject.ForfeitTurn(true);
         }
 
         public override void LoadData(SerializationReader Reader)
@@ -255,21 +230,18 @@ namespace XRL.World.Parts
             foreach (var key in TierSettings.Keys)
             {
                 bool value = TierSettings[key].Item1;
-                Log($"TierSettings for: {key}={value}");
                 Writer.Write(value);
             }
 
             foreach (var key in TypesSettings.Keys)
             {
                 bool value = TypesSettings[key].Item1;
-                Log($"TierSettings for: {key}={value}");
                 Writer.Write(value);
             }
 
             foreach (var key in ArmorSettings.Keys)
             {
                 bool value = ArmorSettings[key].Item1;
-                Log($"TierSettings for: {key}={value}");
                 Writer.Write(value);
             }
         }
