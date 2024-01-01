@@ -60,8 +60,7 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object)
         {
-            AddPlayerMessage("Registering events !", 'R');
-
+            Object.RegisterPartEvent(this, "CommandTakeObject");
             Object.RegisterPartEvent(this, _DisplayQuickMenu);
             Object.RegisterPartEvent(this, _DisplaySettings);
 
@@ -70,6 +69,16 @@ namespace XRL.World.Parts
 
         public override bool FireEvent(Event E)
         {
+            if (E.ID == "CommandTakeObject")
+            {
+                GameObject g = E.GetParameter("Object") as GameObject;
+
+                if (g.GetIntProperty(Constants.QuickPickupProperty)>0)
+                {
+                    g.GetIntProperty(Constants.QuickPickupProperty);
+                }
+            }
+
             if (E.ID == _DisplayQuickMenu)
             {
                 BuildPopup();
@@ -142,16 +151,9 @@ namespace XRL.World.Parts
                 return;
             }
 
-            foreach(var obj in selection)
-            {
-                QudUX.Utilities.Logger.Log(obj.ShortDisplayName);
-            }
-            
-            QudUX.Utilities.Logger.Log("#################");
-
             var meleeTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MeleeWeapon"))
                             .GroupBy(obj => obj.GetBlueprint().Inherits);
-                            
+
             var rangedTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MissileWeapon"))
                             .GroupBy(obj => obj.GetBlueprint().Inherits);
 
@@ -160,29 +162,29 @@ namespace XRL.World.Parts
 
             selection = new List<GameObject>();
 
-            foreach(var group in meleeTypes)
+            foreach (var group in meleeTypes)
             {
-                selection.AddRange(group.OrderByDescending(obj => 
+                selection.AddRange(group.OrderByDescending(obj =>
                 {
-                    if(!obj.HasTag("Tier")) return 0;
+                    if (!obj.HasTag("Tier")) return 0;
                     return obj.GetTier();
                 }));
             }
 
-            foreach(var group in rangedTypes)
+            foreach (var group in rangedTypes)
             {
                 selection.AddRange(group.OrderByDescending(obj =>
                 {
-                    if(!obj.HasTag("Tier")) return 0;
+                    if (!obj.HasTag("Tier")) return 0;
                     return obj.GetTier();
                 }));
             }
 
-            foreach(var group in armorTypes)
+            foreach (var group in armorTypes)
             {
                 selection.AddRange(group.OrderByDescending(obj =>
                 {
-                    if(!obj.HasTag("Tier")) return 0;
+                    if (!obj.HasTag("Tier")) return 0;
                     return obj.GetTier();
                 }));
             }
@@ -202,7 +204,7 @@ namespace XRL.World.Parts
                 Icons: icons.ToArray()
             );
 
-            if(results == null || results.Count == 0) return;
+            if (results == null || results.Count == 0) return;
 
 
             foreach (int index in results)
@@ -220,7 +222,7 @@ namespace XRL.World.Parts
 
                 AutoAct.SetAutoexploreSuppression(current, false);
                 AutoAct.SetAutoexploreActionProperty(current, "Autoget", -1);
-                current.SetStringProperty(Constants.QuickPickupProperty, "yes");
+                current.SetIntProperty(Constants.QuickPickupProperty, 1);
             }
 
             The.Player.CurrentZone.FlushNavigationCaches();
