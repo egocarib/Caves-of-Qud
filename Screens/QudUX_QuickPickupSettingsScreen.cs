@@ -47,7 +47,7 @@ namespace XRL.UI
         private static ScreenBuffer _Buffer;
 
         private Vector2i _ItemListSectionStart = new Vector2i(3, 4);
-        private Vector2i _ItemDescriptionSectionStart = new Vector2i(40, 2);
+        private Vector2i _ItemDescriptionSectionStart = new Vector2i(35, 2);
 
         public void Init(TextConsole console, ScreenBuffer buffer)
         {
@@ -70,32 +70,26 @@ namespace XRL.UI
             {
                 _Buffer.Clear();
                 _Buffer.SingleBox(0, 0, 79, 2, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
-                _Buffer.SingleBox(0, 2, 79, 17, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
-                _Buffer.SingleBox(0, 17, 79, 24, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
+                _Buffer.SingleBox(0, 2, 79, 19, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
+                _Buffer.SingleBox(0, 19, 79, 24, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
 
                 string a = "&y{{W|Disabled}} items will be {{W|ignored}} when listing object.";
                 string b = "&y{{W|Tier}} and {{W|Type}} filters will both be applied {{W|additively}}.";
-                string c = "&cQuick Pickup might perform other Auto-Explore actions";
-                string d = "&cbefore or after picking up selected objects.";
                 
-                int height = ((7 - 4) / 2) + 18;
+                int height = ((5 - 2) / 2) + 20;
                 _Buffer.Goto(GetCenteredOffsetForString(a), height);
                 _Buffer.Write(a);
                 _Buffer.Goto(GetCenteredOffsetForString(b), ++height);
                 _Buffer.Write(b);
-                _Buffer.Goto(GetCenteredOffsetForString(c), ++height);
-                _Buffer.Write(c);
-                _Buffer.Goto(GetCenteredOffsetForString(d), ++height);
-                _Buffer.Write(d);
-
+                
                 _Buffer.Goto(0, 2);
                 _Buffer.Write(195);
-                _Buffer.Goto(0, 17);
+                _Buffer.Goto(0, 19);
                 _Buffer.Write(195);
 
                 _Buffer.Goto(79, 2);
                 _Buffer.Write(180);
-                _Buffer.Goto(79, 17);
+                _Buffer.Goto(79, 19);
                 _Buffer.Write(180);
 
 
@@ -195,7 +189,7 @@ namespace XRL.UI
                         lines[lines.Count - 1] += " ";
                 }
 
-                int initHeight = (15 - lines.Count) / 2;
+                int initHeight = (17 - lines.Count) / 2;
                 int xOffset = (80 - _ItemDescriptionSectionStart.x - ColorUtility.LengthExceptFormatting(lines.OrderByDescending(s => s.Length).ToArray()[0])) / 2;
                 for (int i = 0; i < lines.Count; i++)
                 {
@@ -205,11 +199,11 @@ namespace XRL.UI
 
                 int half = 80 / 2;
                 string enableAll = "&y{{W|E}}nable All";
-                _Buffer.Goto((half - ColorUtility.LengthExceptFormatting(enableAll)) / 2, 16);
+                _Buffer.Goto((half - ColorUtility.LengthExceptFormatting(enableAll)) / 2, 18);
                 _Buffer.Write(enableAll);
 
                 string disableAll = "&y{{W|D}}isable All";
-                _Buffer.Goto(half + (half - ColorUtility.LengthExceptFormatting(disableAll) )/ 2, 16);
+                _Buffer.Goto(half + (half - ColorUtility.LengthExceptFormatting(disableAll) )/ 2, 18);
                 _Buffer.Write(disableAll);
 
                 _Buffer.EscOr5ToExit();
