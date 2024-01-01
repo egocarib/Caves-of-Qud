@@ -226,7 +226,7 @@ namespace XRL.World.Parts
                         {
                             int fingers = Math.Max(1, (int)daysTillRestock);
                             restockDialog = "\n&w*Smiling, Sparafucile gives a slight nod.*&y\n\n"
-                                + "&w*=pronouns.Subjective= purses =pronouns.possessive= lips thoughtfully for a moment, then raises " + fingers + " thin finger" + (fingers > 1 ? "s" : "") + ".*&y\n ";
+                                + $"&w*{speaker.it} purses {speaker.its} lips thoughtfully for a moment, then raises " + fingers + " thin finger" + (fingers > 1 ? "s" : "") + ".*&y\n ";
                         }
                     }
                     else

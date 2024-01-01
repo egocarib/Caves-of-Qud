@@ -75,7 +75,7 @@ namespace XRL.UI
 
                 string a = "&y{{W|Disabled}} items will be {{W|ignored}} when listing object.";
                 string b = "&y{{W|Tier}} and {{W|Type}} filters will both be applied {{W|additively}}.";
-                string c = "&cQuick Pickup might perform {{W|other Auto-Explore actions}}";
+                string c = "&cQuick Pickup might perform other Auto-Explore actions";
                 string d = "&cbefore or after picking up selected objects.";
                 
                 int height = ((7 - 4) / 2) + 18;
