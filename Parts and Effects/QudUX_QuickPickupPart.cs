@@ -151,43 +151,26 @@ namespace XRL.World.Parts
                 return;
             }
 
-            var meleeTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MeleeWeapon"))
-                            .GroupBy(obj => obj.GetBlueprint().Inherits);
-
-            var rangedTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("MissileWeapon"))
-                            .GroupBy(obj => obj.GetBlueprint().Inherits);
-
-            var armorTypes = selection.Where(obj => obj.GetBlueprint().InheritsFrom("Armor"))
-                            .GroupBy(obj => obj.GetBlueprint().Inherits);
-
-            selection = new List<GameObject>();
-
-            foreach (var group in meleeTypes)
+            List<GameObject> orderedGameObjects = new List<GameObject>();
+            foreach(GameObject obj in SelectAndOrderObjects(selection, "MeleeWeapon"))
             {
-                selection.AddRange(group.OrderByDescending(obj =>
-                {
-                    if (!obj.HasTag("Tier")) return 0;
-                    return obj.GetTier();
-                }));
+                orderedGameObjects.Add(obj);
+                selection.Remove(obj);
             }
 
-            foreach (var group in rangedTypes)
+            foreach(GameObject obj in SelectAndOrderObjects(selection, "MissileWeapon"))
             {
-                selection.AddRange(group.OrderByDescending(obj =>
-                {
-                    if (!obj.HasTag("Tier")) return 0;
-                    return obj.GetTier();
-                }));
+                orderedGameObjects.Add(obj);
+                selection.Remove(obj);
             }
 
-            foreach (var group in armorTypes)
+            foreach(GameObject obj in SelectAndOrderObjects(selection, "Armor"))
             {
-                selection.AddRange(group.OrderByDescending(obj =>
-                {
-                    if (!obj.HasTag("Tier")) return 0;
-                    return obj.GetTier();
-                }));
+                orderedGameObjects.Add(obj);
+                selection.Remove(obj);
             }
+
+            selection = orderedGameObjects;
 
             List<string> options = new List<string>();
             foreach (var obj in selection)
@@ -311,6 +294,15 @@ namespace XRL.World.Parts
                         candidates.Remove(obj);
                 }
             }
+        }
+    
+        private IEnumerable<GameObject> SelectAndOrderObjects(List<GameObject> objects, string parentBlueprint)
+        {
+            return objects.Where(obj => obj.GetBlueprint().InheritsFrom(parentBlueprint))
+                            .OrderByDescending(obj => {
+                                if(!obj.HasTag("Tier")) return 0;
+                                return obj.GetTier();
+                            });
         }
     }
 }

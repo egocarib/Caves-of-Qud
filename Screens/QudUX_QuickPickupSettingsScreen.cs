@@ -73,10 +73,10 @@ namespace XRL.UI
                 _Buffer.SingleBox(0, 2, 79, 17, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
                 _Buffer.SingleBox(0, 17, 79, 24, ColorUtility.MakeColor(TextColor.Grey, TextColor.Black));
 
-                string a = "&yYou can decide here {{W|which items}} you want to be listed in";
-                string b = "&ythe {{W|Quick Pickup-up QuickMenu}}. Items can either be filtered";
-                string c = "&yby their {{W|Tier}} or by their {{W|Type}}. Both filters will be";
-                string d = "&y{{W|combined additively}} when scanning nearby items.";
+                string a = "&y{{W|Disabled}} items will be {{W|ignored}} when listing object.";
+                string b = "&y{{W|Tier}} and {{W|Type}} filters will both be applied {{W|additively}}.";
+                string c = "&cQuick Pickup might perform {{W|other Auto-Explore actions}}";
+                string d = "&cbefore or after picking up selected objects.";
                 
                 int height = ((7 - 4) / 2) + 18;
                 _Buffer.Goto(GetCenteredOffsetForString(a), height);
