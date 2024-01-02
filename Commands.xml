@@ -4,4 +4,10 @@
   <command ID="QudUX_OpenSpriteMenu" DisplayText="Modify Character Sprite" Category="QudUX" Layer="Adventure" Auto="Down"></command>
   <command ID="QudUX_OpenAutogetMenu" DisplayText="Open Autoget Settings" Category="QudUX" Layer="Adventure" Auto="Down"></command>
   <command ID="QudUX_OpenGameStatsMenu" DisplayText="Display Games Statistics" Category="QudUX" Layer="Adventure" Auto="Down"></command>
+  <command ID="QudUX_OpenQuickPickupQuickMenu" DisplayText="Display Quick PickUp QuickMenu" Category="QudUX" Layer="Adventure" Auto="Down">
+    <keyboardBind Modifier="ctrl" Key="numpad0"/>
+  </command>
+  <command ID="QudUX_OpenQuickPickupSettingsMenu" DisplayText="Display Quick PickUp Settings" Category="QudUX" Layer="Adventure" Auto="Down">
+    <keyboardBind Modifier="ctrl" Key="numpad5"/>
+  </command>
 </commands>

@@ -92,14 +92,12 @@ namespace XRL.World.Parts
         {
             ZoneTradersTradedWith.Add(trader);
             bool res = QudUX_ConversationHelper.AddChoiceToRestockers();
-            QudUXLogger.Log("Choices addition " + (res ? "Succeeded" : "failed"));
         }
 
         public static bool AddChoiceToRestockers(Conversation convo = null, GameObject speaker = null)
         {
             if (!Options.Conversations.AskAboutRestock)
             {
-                QudUXLogger.Log("because false option is disabled");
                 return false;
             }
 
@@ -112,7 +110,6 @@ namespace XRL.World.Parts
                     speaker = ConversationUI.Speaker;
                     if(speaker == null)
                     {
-                        QudUXLogger.Log("speaker is null");
                         return false;
                     }
                 }
@@ -124,20 +121,16 @@ namespace XRL.World.Parts
                     convo = ConversationUI.CurrentConversation;
                     if (convo == null)
                     {
-                        QudUXLogger.Log("conversation is null");
                         return false;
                     }
                 }
 
-                QudUXLogger.Log($"speaker is {speaker.DisplayName}");
-                QudUXLogger.Log($"convo is {convo.ID}");
 
                 _debugSegmentCounter = 2;
 
                 //you must view a trader's goods before the new conversation options become available.
                 if (!QudUX_ConversationHelper.ZoneTradersTradedWith.Contains(speaker))
                 {
-                    QudUXLogger.Log("Returning because player didn't take a look at trader's stock");
                     return false;
                 }
                 _debugSegmentCounter = 3;
@@ -184,7 +177,6 @@ namespace XRL.World.Parts
                 }
                 else
                 {
-                    QudUXLogger.Log("Returning false because speaker has no restocker part");
                     return false;
                 }
                 _debugSegmentCounter = 11;
@@ -226,7 +218,7 @@ namespace XRL.World.Parts
                         {
                             int fingers = Math.Max(1, (int)daysTillRestock);
                             restockDialog = "\n&w*Smiling, Sparafucile gives a slight nod.*&y\n\n"
-                                + "&w*=pronouns.Subjective= purses =pronouns.possessive= lips thoughtfully for a moment, then raises " + fingers + " thin finger" + (fingers > 1 ? "s" : "") + ".*&y\n ";
+                                + $"&w*{speaker.it} purses {speaker.its} lips thoughtfully for a moment, then raises " + fingers + " thin finger" + (fingers > 1 ? "s" : "") + ".*&y\n ";
                         }
                     }
                     else
