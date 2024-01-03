@@ -60,7 +60,7 @@ namespace XRL.World.Parts
             List<PointOfInterest> legendaryCreatures = GetPointsOfInterestEvent.GetFor(The.Player)
             .Where(
                 point =>
-                point.Object.HasProperty("Hero") || point.Object.GetStringProperty("Role") == "Hero" && point.Object.HasPart(typeof(GivesRep))
+                (point.Object.HasProperty("Hero") || point.Object.GetStringProperty("Role") == "Hero") && point.Object.HasPart(typeof(GivesRep))
             ).ToList();
 
             if(legendaryCreatures.Count == 0)
