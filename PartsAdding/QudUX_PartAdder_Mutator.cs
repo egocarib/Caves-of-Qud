@@ -15,7 +15,7 @@ namespace XRL
             player.AddPart<QudUX_LegendaryInteractionListener>();
             player.AddPart<QudUX_QuickPickupPart>();
 
-            QudUX.Utilities.Logger.Log("Added parts on player through mutator");
+            QudUX.Utilities.Logger.Log("Player parts initialized (via mutator)");
         }
     }
 }

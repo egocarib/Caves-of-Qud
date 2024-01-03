@@ -56,15 +56,15 @@ namespace XRL.World.Parts
                     }
                     string questID = speaker.GetStringProperty("GivesDynamicQuest", string.Empty);
                     Conversation convo = E.GetParameter<Conversation>("Conversation");
-                    QudUXLogger.Log("conversation is " + (convo != null ? "not null" : "null"));
+                    //QudUXLogger.Log("conversation is " + (convo != null ? "not null" : "null"));
                     
                     if (speaker.HasPart("GenericInventoryRestocker") || speaker.HasPart("Restocker"))
                     {
                         try
                         {
-                            QudUXLogger.Log("Started Conversation with restocker, adding conversation choices");
+                            //QudUXLogger.Log("Started Conversation with restocker, adding conversation choices");
                             bool res = QudUX_ConversationHelper.AddChoiceToRestockers(convo, speaker);
-                            QudUXLogger.Log("Choices addition " + (res ? "Succeeded" : "failed"));
+                            //QudUXLogger.Log("Choices addition " + (res ? "Succeeded" : "failed"));
 
                         }
                         catch (Exception ex)

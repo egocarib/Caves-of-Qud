@@ -21,7 +21,7 @@ namespace XRL
                 player.RequirePart<QudUX_LegendaryInteractionListener>();
                 player.RequirePart<QudUX_QuickPickupPart>();
 
-                QudUX.Utilities.Logger.Log("Ensured Parts on player through Game Loaded callback");
+                QudUX.Utilities.Logger.Log("Player parts initialized (after game load)");
             }
         }
     }

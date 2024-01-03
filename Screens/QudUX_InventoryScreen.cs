@@ -588,10 +588,10 @@ namespace XRL.UI
 
                 keys = ConsoleLib.Console.Keyboard.getvk(Options.MapDirectionsToKeypad, true);
 
-                if(keys == Keys.MouseEvent)
-                    QudUX.Utilities.Logger.Log("MouseEvent: " +Keyboard.CurrentMouseEvent.Event);
-                else
-                    QudUX.Utilities.Logger.Log(keys.ToString());
+                // if(keys == Keys.MouseEvent)
+                //     QudUX.Utilities.Logger.Log("MouseEvent: " +Keyboard.CurrentMouseEvent.Event);
+                // else
+                //     QudUX.Utilities.Logger.Log(keys.ToString());
 
                 string ts = "";
                 char ch = (ts + (char) Keyboard.Char + " ").ToLower()[0];
