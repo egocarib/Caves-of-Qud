@@ -13,7 +13,7 @@ namespace QudUX.Harmony_Patches
         static void Postfix(string Path, ref exTextureInfo __result)
         {
             //This postfix assumes that it is always running on the UI (Unity) thread.
-            if (__result == null && Path.EndsWith(Constants.FlippedTileSuffix))
+            if (__result == null && Path != null && Path.EndsWith(Constants.FlippedTileSuffix))
             {
                 if (TextureMaker.MakeFlippedTexture(Path, out exTextureInfo result))
                 {
