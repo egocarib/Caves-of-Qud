@@ -29,7 +29,7 @@ Features
 
 Install
 -------
-The mod can be installed directly from this repository by downloading the code and following [these mod installation instructions](https://cavesofqud.gamepedia.com/Modding:Installing_a_mod#Manual_Download).
+The mod can be installed directly from this repository by downloading the code and following [these mod installation instructions](https://wiki.cavesofqud.com/wiki/Modding:Installing_a_mod#Manual_Download).
 
 It is also available on the Steam workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=1804499742
 
