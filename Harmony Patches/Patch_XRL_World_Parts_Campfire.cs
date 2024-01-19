@@ -512,7 +512,7 @@ namespace QudUX.HarmonyPatches
                     yield return new CodeInstruction(OpCodes.Ldc_I4_0); // push 0 on stack
                     yield return new CodeInstruction(OpCodes.Ldloc_S, Seq3.MatchedInstructions[3].operand); // push index on stack
                     Label dontQuit = gen.DefineLabel();
-                    yield return new CodeInstruction(OpCodes.Blt_S, dontQuit); // check if index > 0. if yes, dontQuit
+                    yield return new CodeInstruction(OpCodes.Ble_S, dontQuit); // check if index >= 0. if yes, dontQuit
                     yield return new CodeInstruction(OpCodes.Ldc_I4_0); // if index < 0, push 0 on stack
                     yield return new CodeInstruction(OpCodes.Ret); // and return
                     yield return instruction.WithLabels(dontQuit);
